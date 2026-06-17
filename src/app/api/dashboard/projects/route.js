@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { createAdminClient } from "@/utils/supabase-admin";
 import {
   cleanProjectTitle,
@@ -30,6 +31,10 @@ export async function GET(req) {
     },
     projects: data || [],
     summaries: (data || []).map(projectSummary),
+  }, {
+    headers: {
+      "Cache-Control": "no-store, max-age=0, must-revalidate",
+    }
   });
 }
 
