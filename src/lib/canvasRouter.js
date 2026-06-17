@@ -43,6 +43,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     '/characters': 'characters',
     '/locations': 'locations',
     '/shots': 'shots',
+    '/login': 'login',
   };
   const SEGMENT_ROUTE = {
     audio: '/audio',
@@ -53,6 +54,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     characters: '/characters',
     locations: '/locations',
     shots: '/shots',
+    login: '/login',
     brain: START,
   };
   const KNOWN_SEGMENTS = new Set([
@@ -67,6 +69,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     'characters',
     'locations',
     'shots',
+    'login',
   ]);
 
   // The projectId comes from (in order): CanvasApp's body dataset, the path's first
@@ -386,8 +389,8 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
       return;
     }
 
-    // Analysis and name-detail screens: no orb — hide it and build the panels in.
-    if (path === '/analysis' || path === '/script-analysis' || path === '/characters' || path === '/locations') {
+    // Analysis, login, and name-detail screens: no orb — hide it and build the panels in.
+    if (path === '/analysis' || path === '/script-analysis' || path === '/characters' || path === '/locations' || path === '/login') {
       if (activeTL) activeTL.kill();
       if (gsapReady) gsap.to(orb, { autoAlpha: 0, duration: 0.3, ease: 'power2.out' });
       else orb.style.opacity = '0';

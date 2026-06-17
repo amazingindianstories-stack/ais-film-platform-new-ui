@@ -36,7 +36,7 @@ export default function LoginScreen({ onLoginSuccess }) {
     <section className="screen-auth">
       <div className="auth-card" data-anim>
         <button className="auth-close" onClick={closeLogin} aria-label="Close">×</button>
-        <h1 className="auth-title">Aura</h1>
+        <h1 className="auth-title">AIS Studio</h1>
         
         <div className="auth-header">
           <h2 className="auth-tab is-active">Sign in</h2>
