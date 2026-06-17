@@ -1,0 +1,21 @@
+.entity-selection-box {
+  position: absolute;
+  left: calc(var(--select-x, 0) * 1rem);
+  top: calc(var(--select-y, 0) * 1rem);
+  width: calc(var(--select-w, 0) * 1rem);
+  height: calc(var(--select-h, 0) * 1rem);
+  z-index: 7;
+  pointer-events: none;
+  border: 0.0938rem solid rgba(239, 123, 65, 0.82);
+  border-radius: 0.35rem;
+  background:
+    linear-gradient(135deg, rgba(239, 123, 65, 0.2), rgba(248, 181, 141, 0.06)),
+    rgba(239, 123, 65, 0.08);
+  box-shadow:
+    0 0 0 0.0625rem rgba(243, 239, 236, 0.12),
+    0 0.9rem 2rem rgba(0, 0, 0, 0.24);
+}
+
+.entity-canvas-screen:has(.entity-selection-box) {
+  cursor: crosshair;
+}

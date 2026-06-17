@@ -1,0 +1,182 @@
+/* ─────────────────────────────────────────────────────────────────
+   Audio Analysis screen  (route: /analysis)  — PDF "AUDIO ANALYSIS"
+   ───────────────────────────────────────────────────────────────── */
+
+.analysis-screen {
+  position: absolute;
+  inset: 0;
+  padding: 8.5rem 1.75rem 1.75rem 4.75rem;   /* top room for title+cat; left clears pills */
+  display: flex;
+}
+
+/* ─── Title ───────────────────────────────────────────────────── */
+.analysis-title {
+  position: absolute;
+  top: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ─── Top-right actions (speech bubble) ───────────────────────── */
+.analysis-actions {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.75rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(43, 39, 36, 0.9);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.16);
+  border-radius: 0.85rem;
+}
+/* little tail pointing down toward the cat */
+.analysis-actions::after {
+  content: '';
+  position: absolute;
+  bottom: -0.45rem;
+  left: 1.6rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  background: rgba(43, 39, 36, 0.9);
+  border-right: 0.0625rem solid rgba(243, 239, 236, 0.16);
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.16);
+  transform: rotate(45deg);
+}
+
+.aa-btn {
+  background: var(--pill-bg);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.18);
+  border-radius: 0.5rem;
+  color: var(--mine-100);
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.aa-btn:hover { background: #3a3531; border-color: rgba(243, 239, 236, 0.32); }
+
+/* ─── Peeking cat ─────────────────────────────────────────────── */
+.analysis-cat {
+  position: absolute;
+  top: 3.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6rem;
+  z-index: 6;
+  pointer-events: none;
+}
+.analysis-cat svg { display: block; width: 100%; height: auto; }
+
+/* ─── Content grid ────────────────────────────────────────────── */
+.analysis-grid {
+  flex: 1;
+  display: flex;
+  gap: 1.25rem;
+  width: 100%;
+  min-height: 0;
+}
+
+.aa-panel {
+  background: #2b2522;
+  border: 0.0938rem dashed rgba(243, 239, 236, 0.16);
+  border-radius: 1rem;
+}
+
+/* left — lyrics placeholder */
+.aa-lyrics {
+  flex: 1.85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  min-width: 0;
+}
+.aa-lyrics-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+  text-align: center;
+}
+
+/* right column */
+.aa-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 0;
+}
+
+/* stat grid 2×2 */
+.aa-stats {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem 0.5rem;
+  padding: 1.6rem 1.25rem;
+}
+.aa-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+.aa-stat-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+}
+.aa-stat-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--mine-100);
+}
+
+/* song insights */
+.aa-insights {
+  flex: 1;
+  min-height: 0;
+  padding: 1.25rem 1.4rem;
+  overflow: auto;
+  text-align: center;
+}
+.aa-insights-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--jaffa-400);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+.aa-insights-body {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--mine-100);
+}
+
+@media (max-width: 56em) {
+  .analysis-grid { flex-direction: column; overflow: auto; }
+  .aa-lyrics { min-height: 18rem; }
+}

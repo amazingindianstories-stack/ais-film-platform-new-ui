@@ -1,0 +1,190 @@
+/* ─────────────────────────────────────────────────────────────────
+   Script Analysis screen (route: /script-analysis)
+   Reuses .analysis-screen layout + .analysis-speak cluster + .aa-panel.
+   Three columns: full script | scenes (truncated) | extracted entities.
+   ───────────────────────────────────────────────────────────────── */
+
+.sa-grid {
+  flex: 1;
+  display: flex;
+  gap: 1.25rem;
+  width: 100%;
+  min-height: 0;
+}
+
+.sa-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 1.25rem;
+  overflow: hidden;
+}
+.sa-col--script { flex: 1.35; }
+
+.sa-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  color: rgba(243, 239, 236, 0.64);
+  font-family: var(--font-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sa-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 0.7rem;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(239, 123, 65, 0.65) rgba(243, 239, 236, 0.1);
+  scrollbar-width: thin;
+}
+.sa-scroll::-webkit-scrollbar { width: 0.45rem; }
+.sa-scroll::-webkit-scrollbar-track { background: rgba(243, 239, 236, 0.08); border-radius: 62.4375rem; }
+.sa-scroll::-webkit-scrollbar-thumb { background: rgba(239, 123, 65, 0.65); border-radius: 62.4375rem; }
+
+.sa-script-text {
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--mine-100);
+}
+
+.sa-scene {
+  padding: 0.85rem 0;
+  border-top: 0.0625rem solid rgba(243, 239, 236, 0.08);
+}
+.sa-scene:first-child { border-top: 0; padding-top: 0; }
+.sa-scene__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+  color: rgba(239, 123, 65, 0.92);
+  font-family: var(--font-accent);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.sa-scene__text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--mine-100);
+}
+
+.sa-group { margin-bottom: 1.4rem; }
+.sa-group__label {
+  margin-bottom: 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--jaffa-400);
+}
+.sa-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.sa-chip {
+  padding: 0.4rem 0.7rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.16);
+  border-radius: 0.55rem;
+  background: rgba(28, 24, 21, 0.42);
+  color: var(--mine-100);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.sa-empty {
+  color: rgba(243, 239, 236, 0.48);
+  font-family: var(--font-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sa-status {
+  align-self: center;
+  margin-top: -0.35rem;
+  margin-bottom: 0.7rem;
+  color: var(--jaffa-200);
+  font-family: var(--font-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sa-scene--editable {
+  cursor: grab;
+}
+
+.sa-scene--editable:active {
+  cursor: grabbing;
+}
+
+.sa-scene__input {
+  width: 100%;
+  min-height: 5rem;
+  resize: vertical;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  border-radius: 0.55rem;
+  background: rgba(15, 12, 10, 0.3);
+  color: var(--mine-100);
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.45;
+  padding: 0.75rem;
+}
+
+.sa-scene__input:focus {
+  outline: 0.125rem solid rgba(239, 123, 65, 0.46);
+  outline-offset: 0.0625rem;
+}
+
+.sa-scene__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.sa-scene__tools button {
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 0.45rem;
+  background: rgba(243, 239, 236, 0.04);
+  color: var(--mine-300);
+  cursor: pointer;
+  font-family: var(--font-accent);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.sa-scene__tools button:hover:not(:disabled) {
+  border-color: rgba(239, 123, 65, 0.48);
+  color: var(--mine-100);
+}
+
+.sa-scene__tools button:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+@media (max-width: 56em) {
+  .sa-grid { flex-direction: column; overflow: auto; }
+  .sa-col { min-height: 16rem; }
+}

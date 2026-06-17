@@ -1,0 +1,104 @@
+/* ─────────────────────────────────────────────────────────────────
+   Extracted character/location name screens.
+   ───────────────────────────────────────────────────────────────── */
+
+.entity-screen {
+  position: absolute;
+  inset: 0;
+  padding: 8.5rem 1.75rem 1.75rem 4.75rem;
+}
+
+.entity-actions {
+  position: absolute;
+  top: 1.25rem;
+  right: 3.6rem;
+  z-index: 7;
+}
+
+.entity-shell {
+  display: flex;
+  min-height: 100%;
+}
+
+.entity-panel {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.entity-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  font-family: var(--font-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mine-300);
+}
+
+.entity-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.85rem;
+  overflow: auto;
+  padding-top: 1rem;
+  padding-right: 0.25rem;
+}
+
+.entity-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 4.5rem;
+  padding: 0.9rem 1rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  border-radius: 0.75rem;
+  background: rgba(22, 18, 16, 0.34);
+}
+
+.entity-card__index {
+  font-family: var(--font-accent);
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--jaffa-200);
+}
+
+.entity-card__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--mine-100);
+}
+
+.entity-empty {
+  display: grid;
+  flex: 1;
+  min-height: 18rem;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--mine-300);
+  text-align: center;
+}
+
+@media (max-width: 48em) {
+  .entity-screen {
+    padding: 7rem 1rem 1.25rem 4.25rem;
+  }
+
+  .entity-actions {
+    right: 1rem;
+  }
+}

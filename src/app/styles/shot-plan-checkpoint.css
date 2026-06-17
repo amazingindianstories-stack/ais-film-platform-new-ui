@@ -1,0 +1,166 @@
+.shot-plan-checkpoint {
+  position: fixed;
+  inset: 0;
+  z-index: 42;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+
+.shot-plan-checkpoint__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 7, 6, 0.42);
+  backdrop-filter: blur(0.28rem);
+}
+
+.shot-plan-checkpoint__panel {
+  position: relative;
+  z-index: 1;
+  width: min(37rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 3rem);
+  padding: 1rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.18);
+  border-radius: 0.9rem;
+  background: rgba(39, 36, 33, 0.95);
+  box-shadow: 0 1.4rem 3rem rgba(0, 0, 0, 0.46);
+  overflow: auto;
+}
+
+.shot-plan-checkpoint__panel::before {
+  content: "";
+  position: absolute;
+  left: 2.25rem;
+  top: -0.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-left: 0.0625rem solid rgba(243, 239, 236, 0.18);
+  border-top: 0.0625rem solid rgba(243, 239, 236, 0.18);
+  background: rgba(39, 36, 33, 0.95);
+  transform: rotate(45deg);
+}
+
+.shot-plan-checkpoint__cat {
+  position: absolute;
+  left: 1.25rem;
+  top: -2.25rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  filter: drop-shadow(0 0.55rem 0.8rem rgba(0, 0, 0, 0.28));
+}
+
+.shot-plan-checkpoint__head,
+.shot-plan-checkpoint__actions,
+.shot-plan-checkpoint__foot {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.shot-plan-checkpoint__head {
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+  font-family: var(--font-accent);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.shot-plan-checkpoint__actions {
+  flex-wrap: wrap;
+  margin-bottom: 0.65rem;
+}
+
+.shot-plan-checkpoint button {
+  min-height: 2.1rem;
+  padding: 0 0.78rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.16);
+  border-radius: 0.55rem;
+  background: rgba(243, 239, 236, 0.04);
+  color: var(--mine-100);
+  cursor: pointer;
+  font-family: var(--font-accent);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.16s ease;
+}
+
+.shot-plan-checkpoint button:hover:not(:disabled) {
+  border-color: rgba(239, 123, 65, 0.58);
+}
+
+.shot-plan-checkpoint button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.shot-plan-checkpoint button:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.shot-plan-checkpoint__file {
+  display: none;
+}
+
+.shot-plan-checkpoint__paste {
+  width: 100%;
+  min-height: 11rem;
+  resize: vertical;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  border-radius: 0.7rem;
+  background: rgba(13, 11, 9, 0.38);
+  color: var(--mine-100);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  padding: 0.75rem;
+}
+
+.shot-plan-checkpoint__paste:focus {
+  border-color: rgba(239, 123, 65, 0.62);
+  outline: none;
+}
+
+.shot-plan-checkpoint__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.shot-plan-checkpoint__preview span {
+  border: 0.0625rem solid rgba(239, 123, 65, 0.22);
+  border-radius: 0.45rem;
+  background: rgba(239, 123, 65, 0.08);
+  color: var(--jaffa-200);
+  font-family: var(--font-accent);
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  padding: 0.32rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.shot-plan-checkpoint__status {
+  margin-top: 0.6rem;
+  color: var(--mine-300);
+  font-family: var(--font-accent);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shot-plan-checkpoint__foot {
+  justify-content: flex-end;
+  margin-top: 0.8rem;
+}
+
+.shot-plan-checkpoint__foot button:last-child {
+  border-color: rgba(239, 123, 65, 0.62);
+  background: var(--jaffa-400);
+  color: var(--mine-900);
+}

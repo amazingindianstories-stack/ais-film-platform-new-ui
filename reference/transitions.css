@@ -1,0 +1,95 @@
+/* ─────────────────────────────────────────────────────────────────
+   Screen routing + shared-orb morph
+   ----------------------------------------------------------------
+   Two full-viewport `.screen` layers crossfade on route change. The
+   orb is NOT inside either screen — it lives in #orb-stage, so it
+   survives the swap and morphs (translate + scale via FLIP in
+   router.js) from one screen's [data-orb-slot] to the next.
+   ───────────────────────────────────────────────────────────────── */
+
+:root {
+  --orb-base: 19rem;   /* the orb's intrinsic (scale = 1) box */
+}
+
+/* ─── Screen layers ───────────────────────────────────────────── */
+/* Visibility (not opacity) is toggled — the per-element build/out
+   animations (router.js) own the fade. `.is-leaving` keeps the screen
+   painted while its elements animate away.                          */
+.screen {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  visibility: hidden;          /* still has layout, so slots stay measurable */
+  pointer-events: none;
+}
+
+.screen.is-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.screen.is-leaving {
+  visibility: visible;         /* painted during the exit build-out */
+  pointer-events: none;
+}
+
+/* ─── Element build-in / build-out ────────────────────────────── */
+/* Animating the `scale` PROPERTY (not transform) so the pop composes
+   with elements that already use transform for centering/rotation.
+   Hidden only once JS is ready, so no-JS still shows content.       */
+body.anim-ready [data-anim] { opacity: 0; }
+
+@keyframes build-in {
+  from { opacity: 0; scale: 0.25; }
+  to   { opacity: 1; scale: 1; }
+}
+
+@keyframes build-out {
+  from { opacity: 1; scale: 1; }
+  to   { opacity: 0; scale: 0.5; }
+}
+
+/* ─── Shared orb stage ────────────────────────────────────────── */
+#orb-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;        /* only the orb button itself is hit-testable */
+}
+
+/* The FLIP-controlled wrapper. router.js sets `transform` to overlay the
+   active screen's slot; transform-origin top-left keeps the maths simple
+   (translate to the slot's top-left, then scale by slotWidth / base).   */
+.orb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--orb-base);
+  height: var(--orb-base);
+  /* position/scale owned by GSAP (transformOrigin set to 0 0 in JS) */
+  will-change: transform;
+}
+
+.orb .orb-btn {
+  pointer-events: auto;
+}
+
+/* Orb is only interactive on the starting screen. */
+body:not([data-route="/"]) .orb .orb-btn {
+  pointer-events: none;
+}
+
+/* ─── Orb slots (invisible placeholders the orb morphs to) ────── */
+.orb-slot {
+  width: var(--orb-base);
+  height: var(--orb-base);
+  pointer-events: none;
+}
+
+/* Reduced motion — snap instead of glide/build (router.js also skips
+   the staggered animations, this keeps content visible).            */
+@media (prefers-reduced-motion: reduce) {
+  .orb { transition: none; }
+  body.anim-ready [data-anim] { opacity: 1; }
+}

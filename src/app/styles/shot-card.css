@@ -1,0 +1,226 @@
+/* ─────────────────────────────────────────────────────────────────
+   Shot card — a single shot rendered as a tabbed card. Lives inside a
+   scene board's stack by default; sized to a fixed height so the canvas
+   geometry (SHOT_CARD_H in useShotsCanvas) can lay scene boards out.
+   The active tab grows into an action bar along the bottom.
+   ───────────────────────────────────────────────────────────────── */
+.shot-card {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 26rem;
+  min-height: 26rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0.7rem 0.7rem 0;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 0.85rem;
+  background: rgba(28, 24, 22, 0.92);
+  box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.34);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+}
+
+.shot-card:hover {
+  border-color: rgba(239, 123, 65, 0.55);
+}
+
+.shot-card.is-selected {
+  border-color: rgba(239, 123, 65, 0.92);
+  box-shadow: 0 0 0 0.14rem rgba(239, 123, 65, 0.22), 0 0.9rem 2rem rgba(0, 0, 0, 0.42);
+  transform: translateY(-0.06rem);
+  z-index: 6;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.shot-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.2rem 0.5rem;
+  font-family: var(--font-accent);
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mine-300);
+}
+
+.shot-card__no {
+  color: var(--jaffa-200);
+  white-space: nowrap;
+}
+
+.shot-card__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--mine-100);
+}
+
+.shot-card__dur {
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.4rem;
+  background: rgba(10, 7, 6, 0.6);
+  color: var(--mine-100);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+.shot-card__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* Placeholder panel (images/videos, until their content lands). */
+.shot-tab-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  padding: 0.75rem;
+  text-align: center;
+  border: 0.0625rem dashed rgba(243, 239, 236, 0.18);
+  border-radius: 0.6rem;
+  background:
+    radial-gradient(circle at 50% 120%, rgba(239, 123, 65, 0.08), transparent 62%),
+    rgba(15, 11, 9, 0.42);
+}
+
+.shot-tab-panel__label {
+  font-family: var(--font-accent);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+}
+
+.shot-tab-panel__hint {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  color: var(--mine-300);
+}
+
+/* ── Tab / action strip ─────────────────────────────────────────── */
+.shot-card__tabs {
+  display: flex;
+  gap: 0.0625rem;
+  min-height: 2.7rem;
+  margin: 0.5rem -0.7rem 0;
+  border-top: 0.0625rem solid rgba(243, 239, 236, 0.12);
+}
+
+.shot-card__tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.3rem;
+  border: 0;
+  background: rgba(126, 53, 25, 0.42);
+  color: var(--mine-100);
+  cursor: pointer;
+  font-family: var(--font-accent);
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.15s ease, color 0.15s ease, flex-grow 0.2s ease;
+}
+
+.shot-card__tab:hover {
+  background: var(--jaffa-600);
+}
+
+/* Active tab: the prominent orange bar carrying the label + actions. */
+.shot-card__tab.is-active {
+  flex: 3.4 1 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 0.5rem;
+  background: var(--jaffa-400);
+  color: var(--mine-100);
+  cursor: default;
+}
+
+.shot-card__tab-lead {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  justify-self: start;
+}
+
+.shot-card__tab-name {
+  justify-self: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+}
+
+.shot-card__tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  justify-self: end;
+}
+
+.shot-card__act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: rgba(10, 7, 6, 0.24);
+  color: var(--mine-100);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.shot-card__act svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.shot-card__act:hover {
+  background: rgba(10, 7, 6, 0.45);
+}
+
+.shot-card__act:active {
+  transform: scale(0.9);
+}
+
+/* ── Empty placeholder card ─────────────────────────────────────── */
+.shot-card.is-empty {
+  cursor: default;
+  border-style: dashed;
+  background: rgba(20, 16, 14, 0.5);
+  box-shadow: none;
+}
+
+.shot-card__empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mine-300);
+}

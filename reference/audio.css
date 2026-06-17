@@ -1,0 +1,152 @@
+/* ─────────────────────────────────────────────────────────────────
+   Audio Upload screen  (route: /audio)
+   ───────────────────────────────────────────────────────────────── */
+
+.audio-screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Upload card (cat-eared orange panel) ────────────────────── */
+.upload-card {
+  position: absolute;
+  top: 17%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(46rem, 82vw);
+  padding: 1rem;
+  background: var(--jaffa-400);
+  border-radius: 1.75rem;
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
+}
+
+/* cat ears — orange triangles poking above the top corners */
+.card-ear {
+  position: absolute;
+  top: -1.15rem;
+  width: 0;
+  height: 0;
+  border-left: 1.6rem solid transparent;
+  border-right: 1.6rem solid transparent;
+  border-bottom: 2rem solid var(--jaffa-400);
+  z-index: 0;
+}
+.card-ear--l { left: 2.2rem;  transform: rotate(-14deg); }
+.card-ear--r { right: 2.2rem; transform: rotate(14deg); }
+
+/* pixel "deal with it" sunglasses centred on the top edge */
+.card-glasses {
+  position: absolute;
+  top: -0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  line-height: 0;
+}
+.card-glasses svg {
+  display: block;
+  width: 5.25rem;
+  height: auto;
+}
+
+/* dashed drop target */
+.dropzone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  padding: 2rem;
+  text-align: center;
+  background: #45403c;
+  border: 0.125rem dashed rgba(243, 239, 236, 0.28);
+  border-radius: 1.15rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.dropzone:hover { background: #4d4742; }
+.dropzone.is-drag {
+  background: #534c47;
+  border-color: var(--mine-100);
+}
+
+.dropzone-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+  pointer-events: none;
+}
+
+.dropzone-input {
+  position: absolute;
+  width: 0.1rem;
+  height: 0.1rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* little feet at the bottom of the card */
+.card-foot {
+  position: absolute;
+  bottom: -0.55rem;
+  width: 1.7rem;
+  height: 1.05rem;
+  background: var(--jaffa-400);
+  border-radius: 0 0 1rem 1rem;
+  z-index: 0;
+}
+.card-foot--l { left: 3.25rem; }
+.card-foot--r { right: 3.25rem; }
+
+/* ─── Particle stream (card → orb) ────────────────────────────── */
+/* Outer element is the build-animated container (router.js drives its
+   `scale`/opacity); the inner __flow keeps the particles falling so the
+   two animations don't clobber each other.                          */
+.particle-stream {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%);
+  width: 2.6rem;
+  height: 26vh;
+  pointer-events: none;
+}
+
+.particle-stream__flow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.85;
+  background-image:
+    radial-gradient(circle, rgba(243, 239, 236, 0.95) 16%, transparent 17%),
+    radial-gradient(circle, rgba(239, 123, 65, 0.85) 16%, transparent 17%);
+  background-size: 0.5rem 0.95rem, 0.75rem 1.4rem;
+  background-position: 0.3rem 0, 1.2rem 0.5rem;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 70%, transparent);
+  animation: stream-fall 1.5s linear infinite;
+}
+
+@keyframes stream-fall {
+  to { background-position: 0.3rem 0.95rem, 1.2rem 1.9rem; }
+}
+
+/* ─── Orb landing slot for this screen ────────────────────────── */
+/* Large and pushed far below the bottom edge so only ~30% peeks up
+   (the cat's body). translateY(70%) of a 40rem box hides 28rem.     */
+.orb-slot--audio {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 40rem;
+  height: 40rem;
+  transform: translate(-50%, 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particle-stream__flow { animation: none; }
+}

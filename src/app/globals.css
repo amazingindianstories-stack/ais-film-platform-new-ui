@@ -1,0 +1,3 @@
+/* Global stylesheet — imports the ported design system.
+   styles.css already @imports transitions/audio/player/analysis. */
+@import './styles/styles.css';

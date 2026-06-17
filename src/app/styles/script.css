@@ -1,0 +1,59 @@
+/* ─────────────────────────────────────────────────────────────────
+   Script Upload screen  (route: /script)
+   Reuses the audio cat-dropzone (audio.css) + adds the top-right
+   "Generate Script From Lyrics" action and the generating state.
+   ───────────────────────────────────────────────────────────────── */
+
+.script-generate-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  z-index: 8;
+  background: var(--pill-bg);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.18);
+  border-radius: 0.6rem;
+  color: var(--mine-100);
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.script-generate-btn:hover:not(:disabled) {
+  background: #3a3531;
+  border-color: var(--jaffa-400);
+}
+.script-generate-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.script-speak {
+  position: absolute;
+  top: max(5.25rem, calc(17% - 4.7rem));
+  left: 50%;
+  z-index: 9;
+  transform: translateX(-50%);
+}
+
+.analysis-actions--script {
+  justify-content: center;
+}
+
+.script-generating {
+  position: absolute;
+  bottom: 24%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  font-family: var(--font-accent);
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+}

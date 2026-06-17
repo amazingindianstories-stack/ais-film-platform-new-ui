@@ -1,0 +1,139 @@
+/* ─────────────────────────────────────────────────────────────────
+   Audio Player screen  (route: /player)  — PDF "AUDIO ANALYSIS" (pre-analyse)
+   Sits between /audio (upload) and /analysis (results).
+   ───────────────────────────────────────────────────────────────── */
+
+.player-screen {
+  position: absolute;
+  inset: 0;
+}
+
+/* peeking-eyes cat above the panel */
+.player-cat {
+  position: absolute;
+  top: 3.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5.5rem;
+  z-index: 6;
+  pointer-events: none;
+}
+.player-cat svg { display: block; width: 100%; height: auto; }
+
+/* the dark panel */
+.player-panel {
+  position: absolute;
+  top: 6.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(38rem, 78vw);
+  background: #2b2522;
+  border: 0.0938rem dashed rgba(243, 239, 236, 0.16);
+  border-radius: 1.1rem;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.4);
+  z-index: 5;
+}
+
+.player-filename {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mine-100);
+  margin-bottom: 1rem;
+}
+
+.player-body {
+  display: flex;
+  align-items: stretch;
+  gap: 1.25rem;
+}
+
+/* nested player card (art + scrubber + transport) */
+.player-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #1c1815;
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+  min-width: 0;
+}
+.player-art {
+  width: 4rem;
+  height: 4rem;
+  flex-shrink: 0;
+  background: var(--jaffa-400);
+  border-radius: 0.5rem;
+}
+.player-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+}
+.player-scrub {
+  position: relative;
+  height: 0.2rem;
+  background: rgba(243, 239, 236, 0.22);
+  border-radius: 62.4375rem;
+}
+.player-knob {
+  position: absolute;
+  left: 30%;
+  top: 50%;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--mine-100);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.player-transport {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+.player-transport button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--jaffa-400);
+  display: flex;
+  align-items: center;
+}
+.player-transport svg { width: 1.1rem; height: 1.1rem; }
+
+/* right column: dots + analyse */
+.player-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+.player-dots {
+  color: var(--mine-100);
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+.analyse-btn {
+  background: var(--jaffa-400);
+  color: var(--mine-900);
+  border: none;
+  border-radius: 62.4375rem;
+  padding: 0.65rem 1.6rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.analyse-btn:hover { filter: brightness(1.08); }

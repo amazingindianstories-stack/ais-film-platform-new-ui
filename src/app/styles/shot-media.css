@@ -1,0 +1,255 @@
+/* ─────────────────────────────────────────────────────────────────
+   Shot card Images & Videos tabs — the stacked media deck (carousel),
+   the image pool, and the per-image video option columns.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Stacked deck / carousel ────────────────────────────────────── */
+.deck {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.deck__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deck__card {
+  position: absolute;
+  width: 9.5rem;
+  height: 13rem;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  border: 0.14rem solid rgba(243, 239, 236, 0.38);
+  background: rgba(15, 11, 9, 0.6);
+  cursor: pointer;
+  transition: transform 0.24s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.24s ease, border-color 0.16s ease;
+}
+
+.deck--sm .deck__card {
+  width: 6.6rem;
+  height: 9rem;
+}
+
+.deck__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+}
+
+.deck__card.is-active {
+  border-color: rgba(243, 239, 236, 0.72);
+  box-shadow: 0 0.8rem 1.8rem rgba(0, 0, 0, 0.45);
+}
+
+.deck__card.is-selected {
+  border-color: var(--jaffa-400);
+  box-shadow: 0 0 0 0.12rem rgba(239, 123, 65, 0.3), 0 0.8rem 1.8rem rgba(0, 0, 0, 0.45);
+}
+
+.deck__badge {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 0.35rem;
+  background: rgba(10, 7, 6, 0.82);
+  color: var(--jaffa-200);
+  font-family: var(--font-accent);
+  font-size: 0.46rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.deck--sm .deck__badge { font-size: 0.4rem; padding: 0.14rem 0.32rem; }
+
+.deck__remove {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0.32rem;
+  background: rgba(10, 7, 6, 0.72);
+  color: var(--mine-100);
+  cursor: pointer;
+}
+
+.deck__remove svg { width: 0.8rem; height: 0.8rem; }
+.deck__remove:hover { background: var(--jaffa-400); color: var(--mine-900); }
+
+.deck__play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.7rem;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0.1rem 0.45rem rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.deck__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.deck__nav button {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: rgba(243, 239, 236, 0.08);
+  color: var(--mine-100);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.deck__nav button:hover:not(:disabled) { background: rgba(239, 123, 65, 0.28); }
+.deck__nav button:disabled { opacity: 0.35; cursor: default; }
+
+.deck__count {
+  font-family: var(--font-accent);
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--mine-300);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Add (+) control shared by image pool and video columns ─────── */
+.deck-add-row {
+  display: flex;
+  justify-content: center;
+}
+
+.deck-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(243, 239, 236, 0.08);
+  color: var(--mine-100);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.deck-add svg { width: 1.1rem; height: 1.1rem; }
+.deck-add:hover { background: var(--jaffa-400); color: var(--mine-900); }
+.deck-add:active { transform: scale(0.9); }
+
+/* ── Generate button + empty states ─────────────────────────────── */
+.deck-gen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 1.8rem;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: var(--jaffa-400);
+  color: var(--mine-900);
+  cursor: pointer;
+  font-family: var(--font-accent);
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.deck-gen svg { width: 0.9rem; height: 0.9rem; }
+.deck-gen:hover { background: var(--jaffa-200); }
+.deck-gen:active { transform: scale(0.97); }
+
+.deck-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  color: var(--mine-300);
+}
+
+/* ── Images tab ─────────────────────────────────────────────────── */
+.images-tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* ── Videos tab ─────────────────────────────────────────────────── */
+.videos-tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+
+.videos-tab__cols {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 0.9rem;
+  justify-content: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.2rem;
+  scrollbar-color: var(--jaffa-400) rgba(10, 7, 6, 0.4);
+}
+
+.video-col {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.video-col__seed {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.video-col__seed img {
+  width: 6.6rem;
+  height: 9rem;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  opacity: 0.7;
+}
