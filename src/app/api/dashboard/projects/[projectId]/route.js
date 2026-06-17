@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/utils/supabase-admin";
+import { createClient as createServerSupabaseClient } from "@/utils/supabase-server";
 import {
   deleteProjectAndAssets,
   errorResponse,
@@ -15,7 +15,7 @@ export async function GET(req, context) {
     return errorResponse("projectId is required", 400);
   }
 
-  const supabase = createAdminClient();
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("projects")
     .select("*")
@@ -42,7 +42,8 @@ export async function DELETE(req, context) {
     return errorResponse("projectId is required", 400);
   }
 
-  const result = await deleteProjectAndAssets({ projectId, userId: user.id });
+  const supabase = await createServerSupabaseClient();
+  const result = await deleteProjectAndAssets({ projectId, userId: user.id, supabase });
   if (result.error) {
     return errorResponse(result.error, result.status);
   }
