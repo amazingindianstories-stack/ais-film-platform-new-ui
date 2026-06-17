@@ -84,8 +84,7 @@ export async function listProjectAssetPaths(supabase, prefix) {
   return out;
 }
 
-export async function deleteProjectAndAssets({ projectId, userId }) {
-  const supabase = createAdminClient();
+export async function deleteProjectAndAssets({ projectId, userId, supabase }) {
   const { data: project, error: fetchError } = await supabase
     .from("projects")
     .select("id,user_id")

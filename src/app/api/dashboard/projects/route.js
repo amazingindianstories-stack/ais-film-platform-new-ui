@@ -1,5 +1,4 @@
-export const dynamic = 'force-dynamic';
-import { createAdminClient } from "@/utils/supabase-admin";
+import { createClient as createServerSupabaseClient } from "@/utils/supabase-server";
 import {
   cleanProjectTitle,
   deleteProjectAndAssets,
@@ -12,7 +11,7 @@ export async function GET(req) {
   const { user, response } = await requireDashboardUser(req);
   if (response) return response;
 
-  const supabase = createAdminClient();
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("projects")
     .select("*")
@@ -54,7 +53,7 @@ export async function POST(req) {
     return errorResponse("Project title is required", 400);
   }
 
-  const supabase = createAdminClient();
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("projects")
     .insert([{ user_id: user.id, title }])
@@ -91,7 +90,8 @@ export async function DELETE(req) {
     return errorResponse("projectId is required", 400);
   }
 
-  const result = await deleteProjectAndAssets({ projectId, userId: user.id });
+  const supabase = await createServerSupabaseClient();
+  const result = await deleteProjectAndAssets({ projectId, userId: user.id, supabase });
   if (result.error) {
     return errorResponse(result.error, result.status);
   }
