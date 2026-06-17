@@ -81,6 +81,8 @@ export default function WorkflowStepMenu({ studio }) {
     };
   }, [isOpen]);
 
+  if (activeRoute === '/dashboard') return null;
+
   return (
     <aside className="workflow-menu-shell" ref={shellRef} aria-label="Workflow menu">
       <div className="pill pill-profile">

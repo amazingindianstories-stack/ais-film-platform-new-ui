@@ -76,7 +76,7 @@ body.anim-ready [data-anim] { opacity: 0; }
 }
 
 /* Orb is only interactive on the starting screen. */
-body:not([data-route="/"]) .orb .orb-btn {
+body:not([data-route="/brain"]) .orb .orb-btn {
   pointer-events: none;
 }
 
