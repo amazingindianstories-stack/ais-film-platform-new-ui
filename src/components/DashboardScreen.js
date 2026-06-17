@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useDashboardProjects } from '@/hooks/useDashboardProjects';
 
 const stepLabels = [
@@ -108,6 +108,12 @@ export default function DashboardScreen({ onOpenProject }) {
     return `Welcome back, ${name.split('@')[0].split(' ')[0]}`;
   }, [user]);
 
+  useEffect(() => {
+    const handleAuthChange = () => refreshProjects();
+    window.addEventListener('canvas:auth-changed', handleAuthChange);
+    return () => window.removeEventListener('canvas:auth-changed', handleAuthChange);
+  }, [refreshProjects]);
+
   async function handleCreate(event) {
     event.preventDefault();
     const result = await createProject(title);
@@ -142,6 +148,17 @@ export default function DashboardScreen({ onOpenProject }) {
           >
             <span aria-hidden="true">↻</span>
           </button>
+          {isDemo && (
+            <button
+              type="button"
+              className="dashboard-icon-btn"
+              onClick={() => window.dispatchEvent(new CustomEvent('canvas:navigate', { detail: { path: '/login' } }))}
+              aria-label="Sign in to Studio"
+              style={{ padding: '0.9rem 1.5rem', borderRadius: '999rem' }}
+            >
+              <span>Sign In</span>
+            </button>
+          )}
         </header>
 
         <div className="dashboard-command-row">

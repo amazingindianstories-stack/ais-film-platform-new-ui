@@ -1,0 +1,186 @@
+/* ─────────────────────────────────────────────────────────────────
+   Auth screen  (route: /login)
+   ───────────────────────────────────────────────────────────────── */
+
+.screen-auth {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: auto;
+}
+
+.auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 26rem;
+  padding: 2.5rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 1rem;
+  background: rgba(43, 37, 34, 0.94);
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.25rem;
+  background: linear-gradient(90deg, var(--jaffa-400), var(--jaffa-600));
+  border-top-left-radius: 0.9375rem;
+  border-top-right-radius: 0.9375rem;
+}
+
+.auth-title {
+  color: var(--mine-100);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.1);
+  padding-bottom: 0.75rem;
+}
+
+.auth-tab {
+  color: color-mix(in srgb, var(--mine-100) 50%, transparent);
+  font-family: var(--font-accent);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.auth-tab.is-active {
+  color: var(--jaffa-400);
+}
+
+.auth-tab:hover:not(.is-active) {
+  color: var(--mine-100);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.auth-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auth-group label {
+  color: color-mix(in srgb, var(--mine-100) 70%, transparent);
+  font-family: var(--font-accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.auth-input {
+  width: 100%;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 0.5rem;
+  background: rgba(23, 18, 14, 0.82);
+  color: var(--mine-100);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  outline: none;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-input::placeholder {
+  color: color-mix(in srgb, var(--mine-300) 50%, transparent);
+}
+
+.auth-input:focus {
+  border-color: rgba(239, 123, 65, 0.4);
+  box-shadow: 0 0 0 0.125rem rgba(239, 123, 65, 0.2);
+}
+
+.auth-submit {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999rem;
+  background: var(--jaffa-400);
+  color: var(--mine-900);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  padding: 0.95rem 1.5rem;
+  text-transform: uppercase;
+  transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1), filter 0.16s ease;
+}
+
+.auth-submit:hover {
+  filter: brightness(1.1);
+}
+
+.auth-submit:active {
+  transform: scale(0.98);
+}
+
+.auth-submit:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.5);
+  opacity: 0.7;
+}
+
+.auth-error {
+  padding: 0.85rem 1rem;
+  border: 0.0625rem solid rgba(239, 123, 65, 0.45);
+  border-radius: 0.5rem;
+  background: rgba(126, 53, 25, 0.36);
+  color: var(--mine-100);
+  font-family: var(--font-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.auth-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 18, 14, 0.6);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.1);
+  border-radius: 50%;
+  color: var(--mine-300);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.auth-close:hover {
+  color: var(--mine-100);
+  background: rgba(23, 18, 14, 0.9);
+}

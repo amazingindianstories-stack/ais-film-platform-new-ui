@@ -8,6 +8,7 @@ import ShotsScreen from '@/components/ShotsScreen';
 import AgentCatIcon from '@/components/canvas/AgentCatIcon';
 import DashboardScreen from '@/components/DashboardScreen';
 import EntityCanvasScreen from '@/components/EntityCanvasScreen';
+import LoginScreen from '@/components/LoginScreen';
 import MusicPlayer from '@/components/MusicPlayer';
 import ScriptAnalysisScreen from '@/components/ScriptAnalysisScreen';
 import ScriptUploadScreen from '@/components/ScriptUploadScreen';
@@ -356,10 +357,14 @@ export default function CanvasApp() {
         {...checkpointProps}
       />
 
-      {/* ── Project Dashboard screen ── */}
       <main className="screen screen-dashboard is-active" data-route="/dashboard">
         <DashboardScreen onOpenProject={handleOpenProject} />
       </main>
+
+      {/* ── Login screen ── */}
+      <div className="screen screen-login" data-route="/login">
+        <LoginScreen />
+      </div>
 
       <BrainHubScreen
         hasAnalysis={hasAnalysis}
