@@ -6,7 +6,7 @@
   position: absolute;
   inset: 0;
   height: 100%;
-  padding: 4.5rem 2rem 5rem 5rem;
+  padding: 4.5rem 2rem 5rem 2rem;
   overflow: auto;
 }
 
@@ -455,7 +455,7 @@
 
 @media (max-width: 46em) {
   .dashboard-screen {
-    padding: 4.25rem 1rem 5.5rem 4.3rem;
+    padding: 4.25rem 1rem 5.5rem 1rem;
   }
 
   .dashboard-header {

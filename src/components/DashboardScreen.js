@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { useDashboardProjects } from '@/hooks/useDashboardProjects';
+import { createClient } from '@/utils/supabase';
 
 const stepLabels = [
   'Draft',
@@ -102,6 +103,12 @@ export default function DashboardScreen({ onOpenProject }) {
   } = useDashboardProjects();
   const [title, setTitle] = useState('');
 
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.dispatchEvent(new CustomEvent('canvas:auth-changed'));
+  }
+
   const greeting = useMemo(() => {
     const name = user?.full_name || user?.email || '';
     if (!name) return 'Project command center';
@@ -148,7 +155,7 @@ export default function DashboardScreen({ onOpenProject }) {
           >
             <span aria-hidden="true">↻</span>
           </button>
-          {isDemo && (
+          {isDemo ? (
             <button
               type="button"
               className="dashboard-icon-btn"
@@ -157,6 +164,16 @@ export default function DashboardScreen({ onOpenProject }) {
               style={{ padding: '0.9rem 1.5rem', borderRadius: '999rem' }}
             >
               <span>Sign In</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="dashboard-icon-btn dashboard-icon-btn--quiet"
+              onClick={handleSignOut}
+              aria-label="Sign out of Studio"
+              style={{ padding: '0.9rem 1.5rem', borderRadius: '999rem' }}
+            >
+              <span>Sign Out</span>
             </button>
           )}
         </header>

@@ -1,0 +1,281 @@
+/* ─── Video Editor Layout & Sidebar ─── */
+
+.screen-editor {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+  padding: 1.25rem; /* Reduced left padding from 5rem to 1.25rem to reclaim screen space */
+  box-sizing: border-box;
+  gap: 1.25rem;
+}
+
+/* ─── Left Sidebar (Library) ─── */
+.editor-sidebar-left {
+  width: 17.5rem;
+  height: 100%; /* Restored to full height to container the profile menu at the top-left */
+  flex-shrink: 0;
+  background: rgba(43, 37, 34, 0.94);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  box-shadow: 0 1.1rem 2.4rem rgba(0, 0, 0, 0.34);
+}
+
+.editor-library-header {
+  padding: 5.25rem 1.125rem 1.125rem; /* Pushes contents below the horizontal profile pill */
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.1);
+  flex-shrink: 0;
+}
+
+/* Position top-left profile avatar pill horizontally inside the sidebar card boundaries on editor screen */
+.workflow-menu-shell[data-active-route="/editor"] .pill-profile {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  position: absolute !important;
+  top: 2.375rem !important; /* sidebar offset (1.25rem) + 1.125rem padding */
+  left: 2.375rem !important; /* sidebar offset (1.25rem) + 1.125rem padding */
+  width: auto !important;
+  background: var(--pill-bg) !important;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14) !important;
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.24) !important;
+  border-radius: 999rem !important;
+  padding: 0.375rem 0.5rem 0.375rem 0.375rem !important;
+  gap: 0.5rem !important;
+}
+
+/* Align the workflow steps dropdown menu below the horizontal profile pill on editor screen */
+.workflow-menu-shell[data-active-route="/editor"] .workflow-menu-panel {
+  top: 5.875rem !important;
+  left: 2.375rem !important;
+}
+
+.workflow-menu-shell[data-active-route="/editor"] .workflow-menu-panel::before {
+  left: 4.75rem !important;
+}
+
+.editor-library-header .kicker {
+  color: var(--jaffa-200);
+  font-family: var(--font-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.editor-library-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--mine-100);
+  margin-top: 0.375rem;
+  line-height: 1.1;
+}
+
+.editor-library-ready-count {
+  font-size: 0.625rem;
+  color: var(--mine-300);
+  margin-top: 0.375rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.editor-clip-library {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 1.125rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.editor-clip-card {
+  border-radius: 0.625rem;
+  overflow: hidden;
+  background: rgba(23, 18, 14, 0.82);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.24);
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+  transition: transform 0.18s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+}
+
+.editor-clip-card:hover {
+  transform: translateY(-0.1rem);
+  border-color: rgba(239, 123, 65, 0.38);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.32);
+}
+
+.editor-clip-frame {
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  position: relative;
+  overflow: hidden;
+}
+
+.editor-clip-frame-inner {
+  position: absolute;
+  inset: 0;
+}
+
+.editor-clip-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.editor-clip-shadow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(0, 0, 0, 0.8) 100%);
+  pointer-events: none;
+}
+
+.editor-clip-meta-container {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.4375rem;
+  min-width: 0;
+}
+
+.editor-clip-title {
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: var(--mine-100);
+  font-family: var(--font-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.8);
+}
+
+.editor-clip-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.1875rem;
+}
+
+.editor-clip-status-badge {
+  font-size: 0.5rem;
+  font-weight: 900;
+  padding: 0.125rem 0.3125rem;
+  border-radius: 999rem; /* pill shape according to new UI style */
+  font-family: var(--font-accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.editor-clip-status-badge.ready {
+  color: var(--mine-900);
+  background: var(--jaffa-400);
+}
+
+.editor-clip-status-badge.missing {
+  color: color-mix(in srgb, var(--mine-100) 64%, transparent);
+  background: rgba(23, 18, 14, 0.72);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.12);
+}
+
+.editor-clip-duration {
+  font-size: 0.5625rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ─── Main Workspace ─── */
+.editor-main-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  gap: 1.25rem;
+}
+
+.editor-preview-inspector-row {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18.75rem;
+  gap: 1.25rem;
+}
+
+.editor-preview-container {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-radius: 0.75rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 1.1rem 2.4rem rgba(0, 0, 0, 0.34);
+}
+
+.editor-preview-video,
+.editor-preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.editor-preview-fallback-canvas {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.editor-preview-metadata-overlay {
+  position: absolute;
+  left: 0.875rem;
+  top: 0.75rem;
+  background: rgba(43, 37, 34, 0.94) !important;
+  backdrop-filter: blur(0.5rem);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  max-width: 62%;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.4);
+  z-index: 5;
+}
+
+.editor-preview-overlay-title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--mine-100);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editor-preview-overlay-sub {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  margin-top: 0.1875rem;
+  font-family: var(--font-accent);
+}

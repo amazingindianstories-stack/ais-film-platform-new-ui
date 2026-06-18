@@ -21,6 +21,7 @@
 @import url('shot-media.css');
 @import url('studio.css');
 @import url('auth.css');
+@import url('editor.css');
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
 :root {

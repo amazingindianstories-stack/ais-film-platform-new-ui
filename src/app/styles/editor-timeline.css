@@ -1,0 +1,415 @@
+/* ─── Video Editor Timeline & Tracks ─── */
+
+.editor-timeline-section-card {
+  flex-shrink: 0;
+  background: rgba(43, 37, 34, 0.94);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  border-radius: 0.75rem;
+  box-shadow: 0 1.1rem 2.4rem rgba(0, 0, 0, 0.34);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-timeline-outer {
+  flex-shrink: 0;
+  padding: 1rem 1.25rem 0.5rem;
+  background: transparent;
+  border-top: none;
+}
+
+.editor-timeline-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.625rem 1.125rem;
+  background: rgba(23, 18, 14, 0.38);
+  border-top: none;
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.1);
+  flex-shrink: 0;
+}
+
+.editor-time-indicator {
+  font-size: 0.7812rem;
+  font-weight: 600;
+  min-width: 2.875rem;
+  color: var(--mine-100);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.editor-time-indicator.muted {
+  color: var(--text-muted);
+}
+
+.editor-timeline-zoom-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5625rem;
+  margin-left: auto;
+  border-left: 0.0625rem solid rgba(243, 239, 236, 0.1);
+  padding-left: 1.125rem;
+}
+
+.editor-timeline-zoom-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 11.25rem;
+}
+
+/* Custom premium styling for the range input (slider) */
+.editor-zoom-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 0.25rem;
+  border-radius: 999rem;
+  background: rgba(23, 18, 14, 0.82);
+  outline: none;
+  cursor: pointer;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.08);
+}
+
+.editor-zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--jaffa-400);
+  border: 0.0625rem solid var(--mine-100);
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+  box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.4);
+}
+
+.editor-zoom-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: var(--jaffa-300);
+}
+
+.editor-zoom-label {
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  min-width: 3.25rem;
+  text-align: right;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+}
+
+.editor-zoom-btn {
+  width: 2rem;
+  height: 1.875rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 18, 14, 0.72);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  color: var(--mine-100);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.editor-zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(243, 239, 236, 0.25);
+}
+
+.editor-timeline-panel {
+  height: 13.125rem;
+  border: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  border-radius: 0.625rem;
+  background: rgba(23, 18, 14, 0.58);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.625rem;
+}
+
+.editor-timeline-inner-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-timeline-header-bar {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.editor-timeline-header-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--mine-100);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.editor-timeline-header-hint {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  font-family: var(--font-accent);
+}
+
+.editor-timeline-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+}
+
+.editor-timeline-ruler {
+  position: sticky;
+  top: 0;
+  height: 2rem;
+  background: rgba(23, 18, 14, 0.72);
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  z-index: 8;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.editor-timeline-track-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.editor-track-headers {
+  width: 6.5rem;
+  flex-shrink: 0;
+  background: rgba(30, 24, 21, 0.94);
+  border-right: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  box-shadow: 0.25rem 0 1rem rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+}
+
+.editor-track-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0 0.625rem;
+  color: var(--mine-100);
+  font-family: var(--font-accent);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: rgba(43, 37, 34, 0.45);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.editor-track-header.ruler-header {
+  height: 2rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.14);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding-left: 0.625rem;
+}
+
+.editor-track-header.video-header {
+  height: 3.25rem;
+  margin-top: 0.5rem;
+  border-top: 0.0625rem solid rgba(243, 239, 236, 0.08);
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.08);
+}
+
+.editor-track-header.audio-header {
+  height: 2.5rem;
+  margin-top: 0.5rem;
+  border-top: 0.0625rem solid rgba(243, 239, 236, 0.08);
+  border-bottom: 0.0625rem solid rgba(243, 239, 236, 0.08);
+}
+
+.editor-track-row {
+  height: 3.25rem;
+  margin-top: 0.5rem;
+  position: relative;
+  background: rgba(23, 18, 14, 0.38);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.08);
+  border-radius: 0.5rem;
+  box-shadow: inset 0 0.125rem 0.5rem rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.editor-track-row:hover {
+  border-color: rgba(239, 123, 65, 0.22);
+  background: rgba(23, 18, 14, 0.48);
+}
+
+.editor-track-row.audio-track {
+  height: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Beautiful custom capsule timeline clips with white high-contrast labels */
+div.editor-timeline-clip {
+  top: 0.5rem !important; /* Center clip inside 3.25rem track row */
+  height: 2.25rem !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+  cursor: grab !important;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0 !important; /* Remove container padding to allow sub-pixel shrinking */
+  min-width: 0 !important; /* Force flex container to shrink below text size */
+  container-type: inline-size; /* Enable CSS Container Queries for adaptive labels */
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Container Queries to hide clip elements dynamically when squished */
+@container (max-width: 3.125rem) { /* < 50px */
+  div.editor-timeline-clip svg {
+    display: none !important;
+  }
+}
+
+@container (max-width: 2rem) { /* < 32px */
+  .editor-timeline-clip-text {
+    display: none !important;
+  }
+}
+
+div.editor-timeline-clip:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0.375rem 1rem rgba(0, 0, 0, 0.45) !important;
+  transform: translateY(-0.0625rem);
+}
+
+div.editor-timeline-clip:active {
+  cursor: grabbing !important;
+}
+
+div.editor-timeline-clip.is-ready {
+  background: linear-gradient(135deg, rgba(var(--violet-rgb, 124, 58, 237), 0.9) 0%, rgba(var(--violet-rgb, 124, 58, 237), 0.65) 100%) !important;
+  border: 0.0625rem solid rgba(var(--violet-rgb, 124, 58, 237), 0.5) !important;
+}
+
+div.editor-timeline-clip.is-missing {
+  background: rgba(23, 18, 14, 0.72) !important;
+  border: 0.0625rem dashed rgba(243, 239, 236, 0.16) !important;
+}
+
+div.editor-timeline-clip.is-selected {
+  border: 0.125rem solid var(--jaffa-400) !important;
+  box-shadow: 0 0 0 0.125rem rgba(var(--jaffa-400-rgb, 239, 123, 65), 0.25), 0 0.5rem 1.25rem rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Align text and grip icon contrast in clips */
+.editor-timeline-clip-text {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff !important;
+  text-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.4);
+  padding: 0 0.5rem; /* Padding on the text instead of container */
+}
+
+div.editor-timeline-clip svg {
+  color: #ffffff !important;
+  opacity: 0.8;
+}
+
+/* Audio track capsule clip */
+.editor-timeline-audio-clip {
+  top: 0.5rem !important; /* Center inside 2.5rem audio track */
+  height: 1.5rem !important;
+  border-radius: 0.375rem !important;
+  background: linear-gradient(90deg, var(--jaffa-600) 0%, rgba(var(--jaffa-400-rgb, 239, 123, 65), 0.8) 100%) !important;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ─── Bottom Navigation bar ─── */
+.editor-timeline-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem 1rem;
+  flex-shrink: 0;
+  border-top: 0.0625rem solid rgba(243, 239, 236, 0.12);
+  background: rgba(23, 18, 14, 0.48);
+  padding-right: 6.5rem; /* Margin right buffer to prevent overlap with floating Fox Mascot companion! */
+}
+
+.editor-play-btn {
+  border-radius: 50%;
+  width: 2.375rem;
+  height: 2.375rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 18, 14, 0.72);
+  color: var(--mine-100);
+  border: 0.0625rem solid rgba(243, 239, 236, 0.16);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0.1875rem 0.625rem rgba(0, 0, 0, 0.25);
+}
+
+.editor-play-btn:hover {
+  background: rgba(23, 18, 14, 0.88);
+  border-color: rgba(243, 239, 236, 0.25);
+  transform: scale(1.05);
+}
+
+.editor-play-btn.playing {
+  background: var(--jaffa-400);
+  color: var(--mine-900);
+  border-color: var(--jaffa-400);
+  box-shadow: 0 0 0.75rem rgba(var(--jaffa-400-rgb, 239, 123, 65), 0.4);
+}
+
+.editor-export-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999rem; /* pill shape according to new UI style */
+  background: var(--jaffa-400);
+  color: var(--mine-900);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 0.75rem 1.5rem; /* Match new UI padding */
+  text-transform: uppercase;
+  transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1), filter 0.16s ease;
+  margin-left: auto;
+}
+
+.editor-export-trigger-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-0.0625rem);
+}
+
+.editor-export-trigger-btn:active {
+  transform: scale(0.97);
+}

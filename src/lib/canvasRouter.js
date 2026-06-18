@@ -43,6 +43,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     '/characters': 'characters',
     '/locations': 'locations',
     '/shots': 'shots',
+    '/editor': 'editor',
     '/login': 'login',
   };
   const SEGMENT_ROUTE = {
@@ -54,6 +55,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     characters: '/characters',
     locations: '/locations',
     shots: '/shots',
+    editor: '/editor',
     login: '/login',
     brain: START,
   };
@@ -69,6 +71,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     'characters',
     'locations',
     'shots',
+    'editor',
     'login',
   ]);
 
@@ -390,7 +393,7 @@ export function initCanvas({ onAudioFileSelected, onAnalyzeRequested } = {}) {
     }
 
     // Analysis, login, and name-detail screens: no orb — hide it and build the panels in.
-    if (path === '/analysis' || path === '/script-analysis' || path === '/characters' || path === '/locations' || path === '/login') {
+    if (path === '/analysis' || path === '/script-analysis' || path === '/characters' || path === '/locations' || path === '/editor' || path === '/login') {
       if (activeTL) activeTL.kill();
       if (gsapReady) gsap.to(orb, { autoAlpha: 0, duration: 0.3, ease: 'power2.out' });
       else orb.style.opacity = '0';

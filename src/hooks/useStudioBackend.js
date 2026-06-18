@@ -11,6 +11,7 @@ import {
   uploadAudioFile,
   validateAudioFile,
   validateScriptFile,
+  saveShotstackExport,
 } from '@/lib/backendClient';
 import { extractAudioArtworkUrl } from '@/lib/audioArtwork';
 import {
@@ -317,6 +318,14 @@ export function useStudioBackend() {
     }));
   }, []);
 
+  const updateShotstackExport = useCallback((shotstackExport) => {
+    setState((prev) => ({
+      ...prev,
+      projectState: mergeProjectState(prev, { shotstack_export: shotstackExport }),
+      error: '',
+    }));
+  }, []);
+
   const updateKnowledgeBase = useCallback((knowledgeBase) => {
     if (!knowledgeBase) return;
     setState((prev) => ({
@@ -558,5 +567,6 @@ export function useStudioBackend() {
     updateCredits,
     setAudioDuration,
     selectProject,
+    updateShotstackExport,
   };
 }

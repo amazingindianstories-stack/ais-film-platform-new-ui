@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AnalysisLyricsPanel from '@/components/AnalysisLyricsPanel';
 import BrainHubScreen from '@/components/BrainHubScreen';
 import CanvasToolsPill from '@/components/CanvasToolsPill';
@@ -8,6 +8,9 @@ import ShotsScreen from '@/components/ShotsScreen';
 import AgentCatIcon from '@/components/canvas/AgentCatIcon';
 import DashboardScreen from '@/components/DashboardScreen';
 import EntityCanvasScreen from '@/components/EntityCanvasScreen';
+import FoxMascot from '@/components/canvas/FoxMascot';
+import PlayerCat from '@/components/canvas/PlayerCat';
+import AnalysisCat from '@/components/canvas/AnalysisCat';
 import LoginScreen from '@/components/LoginScreen';
 import MusicPlayer from '@/components/MusicPlayer';
 import ScriptAnalysisScreen from '@/components/ScriptAnalysisScreen';
@@ -25,7 +28,9 @@ import {
   GENERATE_LOCATION_COST,
   saveScriptAnalysis,
   saveWardrobe,
+  saveShotstackExport,
 } from '@/lib/backendClient';
+import EditorScreen from '@/components/EditorScreen';
 import { countTimedWords } from '@/lib/backendClient';
 import { scriptEntityNames } from '@/lib/scriptEntities';
 import { useShotPlanCheckpoint } from '@/hooks/useShotPlanCheckpoint';
@@ -34,6 +39,19 @@ import { useStudioBackend } from '@/hooks/useStudioBackend';
 /* The full canvas: persistent orb + pills + mascot + all screens.
    GSAP transition engine is initialised against this DOM after mount. */
 export default function CanvasApp() {
+  const [currentRoute, setCurrentRoute] = useState('/dashboard');
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      setCurrentRoute(document.body.dataset.route || '/dashboard');
+    }
+    const onRouteChange = (event) => {
+      const path = event.detail?.path;
+      if (typeof path === 'string') setCurrentRoute(path);
+    };
+    window.addEventListener('canvas:route-change', onRouteChange);
+    return () => window.removeEventListener('canvas:route-change', onRouteChange);
+  }, []);
   const {
     state: studio,
     projectLabel,
@@ -52,6 +70,7 @@ export default function CanvasApp() {
     updateShotPlan,
     updateKnowledgeBase,
     updateCredits,
+    updateShotstackExport,
   } = useStudioBackend();
   const backendHandlers = useRef({ selectAudioFile, analyzeTrack });
   const hasAutoOpenedProjectRef = useRef(false);
@@ -314,6 +333,15 @@ export default function CanvasApp() {
     return res;
   }, [studio.projectId, studio.projectIsDemo, updateLocations, updateCredits]);
 
+  const handleSaveShotstackExport = useCallback(async (shotstackExport) => {
+    if (!studio.projectId || studio.projectIsDemo) {
+      throw new Error('Open a saved project to save export.');
+    }
+    const res = await saveShotstackExport({ projectId: studio.projectId, shotstackExport });
+    if (res?.shotstack_export) updateShotstackExport(res.shotstack_export);
+    return res;
+  }, [studio.projectId, studio.projectIsDemo, updateShotstackExport]);
+
   const goToScriptAnalysis = useCallback(() => navigateCanvas('/script-analysis'), [navigateCanvas]);
   const handleScriptFile = useCallback((file) => selectScriptFile(file), [selectScriptFile]);
   const handleGenerateScript = useCallback(() => generateScript(), [generateScript]);
@@ -332,7 +360,9 @@ export default function CanvasApp() {
       <WorkflowStepMenu studio={studio} />
 
       {/* ── Tools pill (middle-left) ── */}
-      <CanvasToolsPill onTool={dispatchCanvasTool} />
+      {['/characters', '/locations', '/shots'].includes(currentRoute) && (
+        <CanvasToolsPill onTool={dispatchCanvasTool} />
+      )}
 
       {/* ── Shared orb ── */}
       <div id="orb-stage">
@@ -486,24 +516,19 @@ export default function CanvasApp() {
         onBack={() => navigateCanvas('/brain')}
       />
 
+      <EditorScreen
+        projectId={studio.projectId}
+        audioUrl={studio.audioUrl}
+        projectData={studio.projectState}
+        onSaveShotstackExport={handleSaveShotstackExport}
+      />
+
       {/* ── Audio Player screen (pre-analyse) ── */}
       <div className="screen screen-player" data-route="/player">
         <section className="player-screen">
           <h1 className="analysis-title" data-anim>AUDIO ANALYSIS</h1>
 
-          <div className="player-cat" data-anim aria-hidden="true">
-            <svg viewBox="0 0 120 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <polygon points="34,26 28,4 52,24" fill="#ef7b41" />
-              <polygon points="86,26 92,4 68,24" fill="#ef7b41" />
-              <path d="M22 38 Q22 20 60 20 Q98 20 98 38 Q98 50 60 50 Q22 50 22 38 Z" fill="#ef7b41" />
-              <ellipse cx="50" cy="33" rx="9" ry="11" fill="#fff" />
-              <ellipse cx="70" cy="33" rx="9" ry="11" fill="#fff" />
-              <circle cx="50" cy="31" r="4" fill="#272423" />
-              <circle cx="70" cy="31" r="4" fill="#272423" />
-              <ellipse cx="40" cy="54" rx="9" ry="6" fill="#ef7b41" />
-              <ellipse cx="80" cy="54" rx="9" ry="6" fill="#ef7b41" />
-            </svg>
-          </div>
+          <PlayerCat />
 
           <div className="player-panel" data-anim>
             <div className="player-filename">{studio.fileName || 'NO TRACK SELECTED'}</div>
@@ -532,21 +557,7 @@ export default function CanvasApp() {
           <h1 className="analysis-title" data-anim>AUDIO ANALYSIS</h1>
 
           <div className="analysis-speak" data-anim>
-            <div className="analysis-cat" aria-hidden="true">
-              <svg viewBox="0 0 120 92" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="22,40 13,6 48,32" fill="#ef7b41" />
-                <polygon points="98,40 107,6 72,32" fill="#ef7b41" />
-                <polygon points="25,38 20,15 44,33" fill="#c85f2e" />
-                <polygon points="95,38 100,15 76,33" fill="#c85f2e" />
-                <path d="M14 46 Q14 78 60 78 Q106 78 106 46 Q106 30 60 30 Q14 30 14 46 Z" fill="#ef7b41" />
-                <ellipse cx="60" cy="52" rx="35" ry="20" fill="#f8b58d" />
-                <path d="M42 51 q6 -7 12 0" stroke="#272423" strokeWidth="3.2" fill="none" strokeLinecap="round" />
-                <path d="M66 51 q6 -7 12 0" stroke="#272423" strokeWidth="3.2" fill="none" strokeLinecap="round" />
-                <path d="M55 59 q5 5 10 0" stroke="#272423" strokeWidth="2.6" fill="none" strokeLinecap="round" />
-                <ellipse cx="38" cy="80" rx="10" ry="7.5" fill="#ef7b41" />
-                <ellipse cx="82" cy="80" rx="10" ry="7.5" fill="#ef7b41" />
-              </svg>
-            </div>
+            <AnalysisCat />
             <div className="analysis-actions">
               <button className="aa-btn" type="button" onClick={() => navigateCanvas('/audio')}>Upload New</button>
               <button className="aa-btn" type="button" onClick={() => navigateCanvas('/player')}>Analyse Again</button>
@@ -575,23 +586,7 @@ export default function CanvasApp() {
         </section>
       </div>
 
-      {/* ── Fox mascot (bottom-right) ── */}
-      <div className="mascot" aria-hidden="true">
-        <svg viewBox="0 0 80 68" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="8,42 3,12 28,34" fill="#ef7b41" />
-          <polygon points="10,41 6,17 26,34" fill="#c85f2e" />
-          <polygon points="60,42 65,12 40,34" fill="#ef7b41" />
-          <polygon points="58,41 62,17 42,34" fill="#c85f2e" />
-          <ellipse cx="34" cy="56" rx="31" ry="30" fill="#ef7b41" />
-          <ellipse cx="34" cy="60" rx="21" ry="20" fill="#f8b58d" />
-          <ellipse cx="22" cy="50" rx="4" ry="4" fill="#272423" />
-          <ellipse cx="46" cy="50" rx="4" ry="4" fill="#272423" />
-          <circle cx="23.5" cy="48.5" r="1.3" fill="white" />
-          <circle cx="47.5" cy="48.5" r="1.3" fill="white" />
-          <ellipse cx="34" cy="61" rx="2.5" ry="1.8" fill="#7e3519" />
-          <path d="M30.5 64.5 Q34 67.5 37.5 64.5" stroke="#7e3519" strokeWidth="1.2" strokeLinecap="round" fill="none" />
-        </svg>
-      </div>
+      <FoxMascot />
     </>
   );
 }

@@ -16,7 +16,7 @@ const STEPS = [
   { key: 'locations', name: 'Locations', route: '/locations', needs: 'script' },
   { key: 'shots', name: 'Shots', route: '/shots', needs: 'shots' },
   { key: 'clips', name: 'Clips', pending: true },
-  { key: 'editor', name: 'Editor', pending: true },
+  { key: 'editor', name: 'Editor', route: '/editor', needs: 'shots' },
 ];
 
 const hasAnalysis = (studio) => studio.analysisStatus === 'ready' || Boolean(studio.analysis);
@@ -84,7 +84,7 @@ export default function WorkflowStepMenu({ studio }) {
   if (activeRoute === '/dashboard') return null;
 
   return (
-    <aside className="workflow-menu-shell" ref={shellRef} aria-label="Workflow menu">
+    <aside className="workflow-menu-shell" data-active-route={activeRoute} ref={shellRef} aria-label="Workflow menu">
       <div className="pill pill-profile">
         <div className="avatar-ring">
           <svg className="avatar-placeholder" viewBox="0 0 44 44" fill="none">

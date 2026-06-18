@@ -26,36 +26,17 @@ const partitionToVeoDurations = (value) => {
   const requested = Math.max(toNumber(value, 6), 4);
   if (requested <= 8) return [snapToVeoDuration(requested)];
 
-  const maxSegments = Math.ceil(requested / 4) + 2;
-  let best = null;
-
-  const visit = (parts, total) => {
-    if (parts.length > maxSegments) return;
-    if (total >= requested - 0.01) {
-      const score = {
-        overshoot: Math.max(0, total - requested),
-        distance: Math.abs(total - requested),
-        segments: parts.length,
-      };
-      if (
-        !best ||
-        score.distance < best.score.distance ||
-        (score.distance === best.score.distance && score.overshoot < best.score.overshoot) ||
-        (score.distance === best.score.distance && score.overshoot === best.score.overshoot && score.segments < best.score.segments)
-      ) {
-        best = { parts, score };
-      }
-      return;
+  let remaining = requested;
+  const parts = [];
+  while (remaining > 0) {
+    if (remaining <= 8) {
+      parts.push(snapToVeoDuration(remaining));
+      break;
     }
-
-    VEO_SHOT_DURATIONS
-      .slice()
-      .reverse()
-      .forEach(duration => visit([...parts, duration], total + duration));
-  };
-
-  visit([], 0);
-  return best?.parts?.length ? best.parts : [8];
+    parts.push(8);
+    remaining -= 8;
+  }
+  return parts;
 };
 
 const maxLineEnd = (lines = []) => {
