@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { formatSeconds, shotDuration } from './editorUtils';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
 
 export default function EditorLibrary({
   shots = [],
@@ -63,8 +64,8 @@ export default function EditorLibrary({
                 <div className="editor-clip-frame-inner">
                   {shot.video_url ? (
                     <video
-                      src={shot.video_url}
-                      poster={shot.image_url || undefined}
+                      src={resolveAssetUrl(shot.video_url, 'video', index + 1)}
+                      poster={shot.image_url ? resolveAssetUrl(shot.image_url, 'image', index + 1) : undefined}
                       muted
                       playsInline
                       preload="metadata"
@@ -72,7 +73,7 @@ export default function EditorLibrary({
                       className="editor-clip-media"
                     />
                   ) : shot.image_url ? (
-                    <img src={shot.image_url} alt={shot.n || `Shot ${index + 1}`} className="editor-clip-media" />
+                    <img src={resolveAssetUrl(shot.image_url, 'image', index + 1)} alt={shot.n || `Shot ${index + 1}`} className="editor-clip-media" />
                   ) : (
                     <canvas
                       ref={(el) => {

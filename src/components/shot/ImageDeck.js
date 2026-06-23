@@ -39,7 +39,11 @@ export default function ImageDeck({
               }}
               onClick={() => (active ? onToggleSelect?.(item) : onActiveChange?.(index))}
             >
-              <img src={item.src} alt="" draggable={false} />
+              {media === 'video' || item.src?.endsWith('.mp4') || item.src?.includes('/videos/') ? (
+                <video src={item.src} muted loop autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <img src={item.src} alt="" draggable={false} />
+              )}
               {media === 'video' && <span className="deck__play" aria-hidden="true">▶</span>}
               {selected && <span className="deck__badge">Selected</span>}
               {active && onRemove && (

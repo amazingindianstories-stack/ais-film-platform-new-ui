@@ -9,6 +9,8 @@ import StoryTab from '@/components/shot/StoryTab';
 import TechnicalsTab from '@/components/shot/TechnicalsTab';
 import ImagesTab from '@/components/shot/ImagesTab';
 import VideosTab from '@/components/shot/VideosTab';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
+
 
 // A single shot — its own card, grouped inside a scene board by default but
 // first-class enough to live anywhere on the canvas later. Four tabs along the
@@ -16,7 +18,7 @@ import VideosTab from '@/components/shot/VideosTab';
 // faces; the active tab grows into an action bar carrying contextual controls.
 export default function ShotCard({ shot, index, selected = false, onSelect, projectId }) {
   const [activeTab, setActiveTab] = useState(DEFAULT_SHOT_TAB);
-  const data = useShotCardData({ projectId, shotId: shot?.id });
+  const data = useShotCardData({ projectId, shotId: shot?.id, shot, index });
   const scriptRef = useRef(null);
   const uploadRef = useRef(null);
 
@@ -74,6 +76,20 @@ export default function ShotCard({ shot, index, selected = false, onSelect, proj
       title={shot.p || title}
     >
       <header className="shot-card__head">
+        {shot.image_url && (
+          <img
+            src={resolveAssetUrl(shot.image_url, 'image', index + 1)}
+            alt=""
+            style={{
+              width: '1.4rem',
+              height: '1.4rem',
+              borderRadius: '0.25rem',
+              objectFit: 'cover',
+              marginRight: '0.2rem',
+              border: '0.0625rem solid rgba(243, 239, 236, 0.2)'
+            }}
+          />
+        )}
         <span className="shot-card__no">Shot {shotNumber}</span>
         <span className="shot-card__title">{title}</span>
         {duration > 0 && <span className="shot-card__dur">{duration}s</span>}

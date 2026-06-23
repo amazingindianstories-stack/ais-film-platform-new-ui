@@ -1,6 +1,7 @@
 'use client';
 
 import { formatTime, formatSeconds } from './editorUtils';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
 
 export default function EditorPreview({
   activeClip = null,
@@ -15,8 +16,8 @@ export default function EditorPreview({
         <video
           key={`${activeClip?.id}-${activeShot.video_url}`}
           ref={previewVideoRef}
-          src={activeShot.video_url}
-          poster={activeShot.image_url || undefined}
+          src={resolveAssetUrl(activeShot.video_url, 'video', activeClip.shotIndex + 1)}
+          poster={activeShot.image_url ? resolveAssetUrl(activeShot.image_url, 'image', activeClip.shotIndex + 1) : undefined}
           muted
           playsInline
           preload="metadata"
@@ -24,7 +25,7 @@ export default function EditorPreview({
           className="editor-preview-video"
         />
       ) : activeShot?.image_url ? (
-        <img src={activeShot.image_url} alt={activeShot.n || 'Preview source'} className="editor-preview-image" />
+        <img src={resolveAssetUrl(activeShot.image_url, 'image', activeClip.shotIndex + 1)} alt={activeShot.n || 'Preview source'} className="editor-preview-image" />
       ) : (
         <canvas ref={fallbackPreviewCanvasRef} width={800} height={450} className="editor-preview-fallback-canvas" />
       )}

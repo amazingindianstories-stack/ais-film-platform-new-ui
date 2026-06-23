@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEFAULT_TECHNICALS, SEED_PALETTE, DEFAULT_STORYBOARD } from '@/components/shot/shotCardOptions';
 import { extractPalette, randomCinematicPalette, svgGradientDataUrl, placeholderArt, fileToUrl } from '@/components/shot/shotCardUtils';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
 
 let seq = 0;
 const uid = (prefix) => `${prefix}-${Date.now().toString(36)}-${(seq += 1)}`;
@@ -27,21 +28,53 @@ function loadPersisted(key) {
 }
 
 const emptyPersisted = () => ({ palette: SEED_PALETTE, technicals: DEFAULT_TECHNICALS, script: '' });
-const emptyMedia = () => ({
-  paletteImage: null,
-  lightingImage: null,
-  storyboard: [...DEFAULT_STORYBOARD],
-  images: [],   // { id, src, selected }
-  videos: {},   // { [imageId]: { options: [{ id, src }], selectedId } }
-});
+const emptyMedia = (shot, index) => {
+  const images = [];
+  const videos = {};
+  const storyboard = [...DEFAULT_STORYBOARD];
+
+  const getFallbackSrc = (url, type) => resolveAssetUrl(url, type, (index || 0) + 1);
+
+  const imageSrc = getFallbackSrc(shot?.image_url, 'image');
+
+  const videoSrc = getFallbackSrc(shot?.video_url, 'video');
+
+  if (imageSrc) {
+    images.push({
+      id: 'img-db-default',
+      src: imageSrc,
+      selected: true,
+    });
+
+    if (videoSrc) {
+      videos['img-db-default'] = {
+        options: [
+          {
+            id: 'vid-db-default',
+            src: videoSrc,
+          },
+        ],
+        selectedId: 'vid-db-default',
+      };
+    }
+  }
+
+  return {
+    paletteImage: null,
+    lightingImage: null,
+    storyboard,
+    images,
+    videos,
+  };
+};
 
 // Per-shot card state: colour palette, reference/lighting images, storyboard
 // frames, technical settings, and the shot script. Exposes high-level actions so
 // the card and its tabs stay thin orchestration shells.
-export function useShotCardData({ projectId, shotId }) {
+export function useShotCardData({ projectId, shotId, shot, index }) {
   const key = keyFor(projectId, shotId);
   const [persisted, setPersisted] = useState(() => ({ ...emptyPersisted(), ...(loadPersisted(key) || {}) }));
-  const [media, setMedia] = useState(emptyMedia);
+  const [media, setMedia] = useState(() => emptyMedia(shot, index));
   const [paletteBusy, setPaletteBusy] = useState(false);
   const mediaRef = useRef(media);
   const persistedRef = useRef(persisted);
@@ -51,11 +84,12 @@ export function useShotCardData({ projectId, shotId }) {
   // Reload when the shot/project key changes (card reused for another shot).
   const keyRef = useRef(key);
   useEffect(() => {
-    if (keyRef.current === key) return;
-    keyRef.current = key;
-    setPersisted({ ...emptyPersisted(), ...(loadPersisted(key) || {}) });
-    setMedia(emptyMedia());
-  }, [key]);
+    if (keyRef.current !== key) {
+      keyRef.current = key;
+      setPersisted({ ...emptyPersisted(), ...(loadPersisted(key) || {}) });
+    }
+    setMedia(emptyMedia(shot, index));
+  }, [key, shot, index]);
 
   // Debounced persistence of the serialisable slice.
   const timer = useRef(null);

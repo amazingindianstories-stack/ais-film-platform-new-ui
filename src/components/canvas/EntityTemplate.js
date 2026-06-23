@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { mediaKey, normalizeName, referenceSlot, rotateItems, stop } from './entityConfig';
 import WardrobeOutfitStrip from './WardrobeOutfitStrip';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
 
 /* Functional template shared by Characters and Locations:
    ┌──────────────────────┬───────────────────┐
@@ -190,7 +191,7 @@ export default function EntityTemplate({
                         onClick={isFront ? cycleReferenceStack : undefined}
                         onPointerDown={isFront ? stop : undefined}
                       >
-                        <img src={img.url} alt="" className="entity-reference-image" loading="eager" decoding="async" />
+                        <img src={resolveAssetUrl(img.url, 'image', i)} alt="" className="entity-reference-image" loading="eager" decoding="async" />
                         {images.length === 1 && (
                           <button type="button" className="entity-thumb-del entity-thumb-del--reference"
                             aria-label="Remove image" disabled={busy === 'reference'} onPointerDown={stop}
@@ -215,7 +216,7 @@ export default function EntityTemplate({
                         }}
                         onPointerDown={stop}
                       >
-                        <img src={img.url} alt="" className="entity-reference-mini-img" loading="eager" decoding="async" />
+                        <img src={resolveAssetUrl(img.url, 'image', i)} alt="" className="entity-reference-mini-img" loading="eager" decoding="async" />
                         <button type="button" className="entity-thumb-del entity-thumb-del--mini"
                           aria-label="Remove image" disabled={busy === 'reference'} onPointerDown={stop}
                           onClick={(event) => { event.preventDefault(); event.stopPropagation(); removeImage(img, 'reference'); }}>×</button>
@@ -266,7 +267,7 @@ export default function EntityTemplate({
               <span className="entity-thumbs entity-thumbs--strip" onWheel={handleStripWheel}>
                 {secondary.slice(0, 8).map((img, i) => (
                   <span className="entity-thumb-wrap entity-thumb-wrap--wide" key={img.path || img.url || i}>
-                    <img src={img.url} alt="" className="entity-thumb entity-thumb--wide" />
+                    <img src={resolveAssetUrl(img.url, 'image', i)} alt="" className="entity-thumb entity-thumb--wide" />
                     <button type="button" className="entity-thumb-del" aria-label="Remove image"
                       disabled={busy === secondaryKind} onPointerDown={stop}
                       onClick={(event) => { event.preventDefault(); event.stopPropagation(); removeImage(img, secondaryKind); }}>×</button>

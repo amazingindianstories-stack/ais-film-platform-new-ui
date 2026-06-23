@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { drawClubScene } from '@/utils/drawClubScene';
 import { getProjectAudioDuration, normalizeShotListForVeo } from '@/utils/shotList';
 import { sidePanel } from '@/lib/motion';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
 
 import EditorTimeline from './editor/EditorTimeline';
 import EditorInspector from './editor/EditorInspector';
@@ -376,20 +377,21 @@ export default function EditorScreen({
   const handleDownloadClip = () => {
     if (!selectedShot?.video_url) return;
     const a = document.createElement('a');
-    a.href = selectedShot.video_url;
+    a.href = resolveAssetUrl(selectedShot.video_url, 'video', (selectedClip?.shotIndex || 0) + 1);
     a.download = `shot_${(selectedClip?.shotIndex || 0) + 1}.mp4`;
     a.click();
   };
-
+ 
   const buildShotstackExportClips = () => sortedClips
     .map((clip) => {
       const shot = shots[clip.shotIndex];
-      const sourceUrl = shot?.video_url || shot?.image_url;
-      if (!sourceUrl) return null;
-
+      const rawUrl = shot?.video_url || shot?.image_url;
+      if (!rawUrl) return null;
+ 
       const sourceType = shot.video_url ? 'video' : 'image';
+      const sourceUrl = resolveAssetUrl(rawUrl, sourceType, clip.shotIndex + 1);
       const knownDuration = videoDurations[clip.shotIndex] || toFiniteNumber(shot.video_duration_seconds, clip.duration);
-
+ 
       return {
         id: clip.id,
         shotIndex: clip.shotIndex,
@@ -402,6 +404,7 @@ export default function EditorScreen({
       };
     })
     .filter(Boolean);
+
 
   const handleShotstackExport = async () => {
     setExportError('');

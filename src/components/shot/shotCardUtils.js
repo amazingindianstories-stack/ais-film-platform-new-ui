@@ -63,7 +63,7 @@ export function svgGradientDataUrl(colors = []) {
   const svg =
     `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='130'>` +
     `<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>${stops}</linearGradient></defs>` +
-    `<rect width='200' height='130' fill='url(%23g)'/></svg>`;
+    `<rect width='200' height='130' fill='url(#g)'/></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
@@ -82,10 +82,11 @@ export function placeholderArt(colors = [], seed = 0) {
   const svg =
     `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='260'>` +
     `<defs><linearGradient id='g' gradientTransform='rotate(${angle} 0.5 0.5)'>${stops}</linearGradient></defs>` +
-    `<rect width='200' height='260' fill='url(%23g)'/>` +
+    `<rect width='200' height='260' fill='url(#g)'/>` +
     `<circle cx='${cx}' cy='${cy}' r='48' fill='rgba(255,255,255,0.10)'/>` +
     `<circle cx='${200 - cx}' cy='${260 - cy}' r='32' fill='rgba(0,0,0,0.14)'/></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
 export const fileToUrl = (file) => (file ? URL.createObjectURL(file) : null);
+

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { normalizeName, stop } from './entityConfig';
+import { resolveAssetUrl } from '@/utils/mediaFallback';
 
 function imageList(outfit) {
   const images = Array.isArray(outfit?.images) ? outfit.images : [];
@@ -154,7 +155,7 @@ export default function WardrobeOutfitStrip({
                 />
                 {primary ? (
                   <>
-                    <img src={primary.url} alt="" />
+                    <img src={resolveAssetUrl(primary.url, 'image', index)} alt="" />
                     {images.length > 1 && <span className="wardrobe-outfit__count">+{images.length - 1}</span>}
                     {primary.path && (
                       <button
