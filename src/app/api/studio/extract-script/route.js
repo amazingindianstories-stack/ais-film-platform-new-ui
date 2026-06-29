@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase-admin";
+import { prisma } from "@/utils/prisma";
+import { storage } from "@/utils/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,14 +52,12 @@ export async function POST(req) {
   }
 
   try {
-    const supabase = createAdminClient();
-    const { data: project, error: fetchError } = await supabase
-      .from("projects")
-      .select("project_state")
-      .eq("id", projectId)
-      .single();
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { project_state: true }
+    });
 
-    if (fetchError || !project) {
+    if (!project) {
       return NextResponse.json({ error: "Project not found." }, { status: 404 });
     }
 
@@ -67,11 +66,11 @@ export async function POST(req) {
     // 1) Store the uploaded file in Supabase storage (assets/<projectId>/scripts/).
     const storagePath = `${projectId}/scripts/${Date.now()}-${sanitizeFileName(file.name || "script")}`;
     let fileUrl = "";
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await storage
       .from("assets")
       .upload(storagePath, buffer, { contentType: file.type || "application/octet-stream", upsert: false });
     if (!uploadError) {
-      fileUrl = supabase.storage.from("assets").getPublicUrl(storagePath).data.publicUrl;
+      fileUrl = storage.from("assets").getPublicUrl(storagePath).data.publicUrl;
     }
 
     // 2) Reuse the frozen extractor for the actual parsing.
@@ -133,12 +132,14 @@ export async function POST(req) {
         : {}),
     };
 
-    const { error: updateError } = await supabase
-      .from("projects")
-      .update({ project_state: newState })
-      .eq("id", projectId);
-
-    if (updateError) throw updateError;
+      try {
+        await prisma.project.update({
+          where: { id: projectId },
+          data: { project_state: newState }
+        });
+      } catch (updateError) {
+        throw updateError;
+      }
 
     return NextResponse.json({ success: true, projectId, script: newState.script });
   } catch (error) {

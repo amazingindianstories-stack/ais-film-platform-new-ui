@@ -60,6 +60,7 @@ export default function CanvasApp() {
     analyzeTrack,
     selectScriptFile,
     generateScript,
+    analyzeScript,
     setAudioDuration,
     selectProject,
     hydrateProject,
@@ -343,6 +344,10 @@ export default function CanvasApp() {
   }, [studio.projectId, studio.projectIsDemo, updateShotstackExport]);
 
   const goToScriptAnalysis = useCallback(() => navigateCanvas('/script-analysis'), [navigateCanvas]);
+  const handleAnalyzeScript = useCallback(async () => {
+    const result = await analyzeScript();
+    if (result.ok) navigateCanvas('/script-analysis');
+  }, [analyzeScript, navigateCanvas]);
   const handleScriptFile = useCallback((file) => selectScriptFile(file), [selectScriptFile]);
   const handleGenerateScript = useCallback(() => generateScript(), [generateScript]);
 
@@ -465,7 +470,8 @@ export default function CanvasApp() {
         hasScript={hasScript}
         isExtractingScript={isExtractingScript}
         isGeneratingScript={isGeneratingScript}
-        onAnalyzeScript={goToScriptAnalysis}
+        isAnalyzingScript={studio.scriptStatus === 'analyzing'}
+        onAnalyzeScript={handleAnalyzeScript}
         onGenerateScript={handleGenerateScript}
         onNext={goToScriptAnalysis}
         onScriptFile={handleScriptFile}

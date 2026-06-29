@@ -47,7 +47,7 @@ function normalizeImage(image, index) {
   if (typeof image === "string") return { url: image, label: `Reference ${index + 1}` };
   if (!image || typeof image !== "object") return null;
   const url = image.url || image.image_url || image.publicUrl;
-  if (!url || !/^https?:\/\//i.test(url)) return null;
+  if (!url || !(/^https?:\/\//i.test(url) || String(url).startsWith('/uploads/'))) return null;
   return {
     url,
     label: compact(image.label || image.name || `Reference ${index + 1}`, 120),
@@ -76,15 +76,28 @@ function collectAssetImages(items = [], kind) {
   return refs;
 }
 
+import fs from 'fs/promises';
+import path from 'path';
+
 async function fetchImage(ref) {
-  const response = await fetch(ref.url, { signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS) });
-  if (!response.ok) throw new Error(`Image fetch ${response.status}`);
-  const buffer = await response.arrayBuffer();
-  if (buffer.byteLength > IMAGE_MAX_BYTES) throw new Error("Image too large");
+  let buf;
+  let mime;
+  if (ref.url.startsWith('/uploads/')) {
+    const localPath = path.join(process.cwd(), 'public', ref.url);
+    buf = await fs.readFile(localPath);
+    mime = inferMime(ref.url);
+  } else {
+    const response = await fetch(ref.url, { signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS) });
+    if (!response.ok) throw new Error(`Image fetch ${response.status}`);
+    const arrayBuf = await response.arrayBuffer();
+    buf = Buffer.from(arrayBuf);
+    mime = inferMime(ref.url, response.headers.get("content-type"));
+  }
+  if (buf.byteLength > IMAGE_MAX_BYTES) throw new Error("Image too large");
   return {
     ...ref,
-    mimeType: inferMime(ref.url, response.headers.get("content-type")),
-    data: Buffer.from(buffer).toString("base64"),
+    mimeType: mime,
+    data: buf.toString("base64"),
   };
 }
 

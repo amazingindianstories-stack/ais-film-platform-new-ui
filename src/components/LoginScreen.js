@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase';
+import { signIn } from 'next-auth/react';
 
 export default function LoginScreen({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -9,15 +9,19 @@ export default function LoginScreen({ onLoginSuccess }) {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const supabase = createClient();
-
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
-      const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-      if (loginError) throw loginError;
+      const res = await signIn('credentials', {
+        redirect: false,
+        email,
+        password
+      });
+      if (res?.error) {
+        throw new Error(res.error);
+      }
       window.dispatchEvent(new CustomEvent('canvas:auth-changed'));
       window.dispatchEvent(new CustomEvent('canvas:navigate', { detail: { path: '/dashboard' } }));
       if (onLoginSuccess) onLoginSuccess();

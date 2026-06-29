@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { useDashboardProjects } from '@/hooks/useDashboardProjects';
-import { createClient } from '@/utils/supabase';
+import { signOut } from 'next-auth/react';
 
 const stepLabels = [
   'Draft',
@@ -104,8 +104,7 @@ export default function DashboardScreen({ onOpenProject }) {
   const [title, setTitle] = useState('');
 
   async function handleSignOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut({ redirect: false });
     window.dispatchEvent(new CustomEvent('canvas:auth-changed'));
   }
 

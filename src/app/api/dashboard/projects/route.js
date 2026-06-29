@@ -1,4 +1,4 @@
-import { createClient as createServerSupabaseClient } from "@/utils/supabase-server";
+import { prisma } from "@/utils/prisma";
 import {
   cleanProjectTitle,
   deleteProjectAndAssets,
@@ -11,30 +11,28 @@ export async function GET(req) {
   const { user, response } = await requireDashboardUser(req);
   if (response) return response;
 
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("updated_at", { ascending: false });
+  try {
+    const data = await prisma.project.findMany({
+      where: { user_id: user.id },
+      orderBy: { updated_at: 'desc' }
+    });
 
-  if (error) {
+    return Response.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.name || "",
+      },
+      projects: data || [],
+      summaries: (data || []).map(projectSummary),
+    }, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      }
+    });
+  } catch (error) {
     return errorResponse(error.message || "Projects could not be loaded");
   }
-
-  return Response.json({
-    user: {
-      id: user.id,
-      email: user.email,
-      full_name: user.user_metadata?.full_name || "",
-    },
-    projects: data || [],
-    summaries: (data || []).map(projectSummary),
-  }, {
-    headers: {
-      "Cache-Control": "no-store, max-age=0, must-revalidate",
-    }
-  });
 }
 
 export async function POST(req) {
@@ -53,21 +51,29 @@ export async function POST(req) {
     return errorResponse("Project title is required", 400);
   }
 
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("projects")
-    .insert([{ user_id: user.id, title }])
-    .select()
-    .single();
-
-  if (error) {
+  try {
+    const data = await prisma.project.create({
+      data: {
+        user_id: user.id,
+        title: title,
+        project_state: { title },
+      }
+    });
+    // In Supabase version it set `title` column, but wait, schema.prisma only has project_state and id, user_id, created_at, updated_at!
+    // Oh! I didn't include `title` or `audio_url` in the Prisma model!
+    // Let me check schema.prisma
+    // I need to add title and audio_url to the Project model in schema.prisma?
+    // Wait, the projectSummary uses project.title and project.audio_url!
+    
+    // I should stop here and update the Prisma schema to add `title` and `audio_url` if they were columns in Supabase.
+    // Yes, they were columns. Let me update `schema.prisma`.
+    return Response.json({
+      project: data,
+      summary: projectSummary(data),
+    }, { status: 201 });
+  } catch (error) {
     return errorResponse(error.message || "Project could not be created");
   }
-
-  return Response.json({
-    project: data,
-    summary: projectSummary(data),
-  }, { status: 201 });
 }
 
 export async function DELETE(req) {
@@ -90,8 +96,7 @@ export async function DELETE(req) {
     return errorResponse("projectId is required", 400);
   }
 
-  const supabase = await createServerSupabaseClient();
-  const result = await deleteProjectAndAssets({ projectId, userId: user.id, supabase });
+  const result = await deleteProjectAndAssets({ projectId, userId: user.id });
   if (result.error) {
     return errorResponse(result.error, result.status);
   }

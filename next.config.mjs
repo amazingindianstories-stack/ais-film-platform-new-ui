@@ -8,6 +8,7 @@ const nextConfig = {
   turbopack: {
     root,
   },
+  serverExternalPackages: ['@prisma/client', 'bcryptjs'],
 };
 
 export default nextConfig;

@@ -288,7 +288,7 @@ export async function POST(req) {
       ? []
       : await loadReferenceImages(referenceCandidates, shotIndex);
 
-    if (selectedModel.provider !== IMAGE_MODEL_PROVIDER_BYTEDANCE && previousShotImageUrl && /^https?:\/\//i.test(previousShotImageUrl)) {
+    if (selectedModel.provider !== IMAGE_MODEL_PROVIDER_BYTEDANCE && previousShotImageUrl && (/^https?:\/\//i.test(previousShotImageUrl) || String(previousShotImageUrl).startsWith('/uploads/'))) {
       const continuityReference = {
         kind: "continuity",
         name: "Previous shot",
@@ -314,7 +314,7 @@ export async function POST(req) {
 
     if (selectedModel.provider !== IMAGE_MODEL_PROVIDER_BYTEDANCE) {
       const hasAnchor = safeMatchedCharacters.some((character) => (
-        character?.anchor_image_url && /^https?:\/\//i.test(character.anchor_image_url)
+        character?.anchor_image_url && (/^https?:\/\//i.test(character.anchor_image_url) || String(character.anchor_image_url).startsWith('/uploads/'))
       ));
       const charWardrobeRefs = referenceImages.filter((reference) => (
         reference.kind === "character" || reference.kind === "wardrobe"

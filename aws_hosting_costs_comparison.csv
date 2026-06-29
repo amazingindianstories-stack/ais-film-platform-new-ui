@@ -1,0 +1,19 @@
+Plan Type,Service Name,Resource Configuration,Estimated Usage,Unit Price (USD),Estimated Monthly Cost (USD),Notes
+MVP Startup,AWS App Runner (Next.js),1 vCPU / 2GB RAM,Active 50% of the month,~$0.045 / active hour,18,Automatically scales to zero compute when idle (provisioned memory ~$5/mo still applies)
+MVP Startup,AWS App Runner (Python API),1 vCPU / 2GB RAM,Active 50% of the month,~$0.045 / active hour,18,Automatically scales to zero compute when idle
+MVP Startup,Amazon RDS for PostgreSQL,db.t4g.micro (Single-AZ),730 hours (100%),$0.016 / hour,11.68,Includes 20GB SSD storage
+MVP Startup,Amazon S3,Standard Storage,50 GB / month,$0.023 / GB,1.15,Media storage for uploads
+MVP Startup,Amazon CloudFront & Outbound Data,Data Transfer Out,100 GB / month,$0.00 / GB,0,First 1TB outbound is currently free under AWS Free Tier
+MVP Startup,Amazon Route 53,DNS Hosting,1 Hosted Zone,$0.50 / zone,0.5,Domain management
+MVP Startup,TOTAL ESTIMATE,,,,49.33,Extremely cost-effective for initial beta testing
+,,,,,,
+Robust Production,AWS ECS Fargate (Next.js),2x 1 vCPU / 2GB RAM tasks,730 hours (100%),$0.049 / hour per task,72,Multi-AZ redundancy; always on
+Robust Production,AWS ECS Fargate (Python API),2x 1 vCPU / 2GB RAM tasks,730 hours (100%),$0.049 / hour per task,72,Multi-AZ redundancy; always on
+Robust Production,Application Load Balancer,1 ALB + LCU usage,730 hours (100%),$0.0225 / hour + LCU,20,Required to route traffic to ECS Fargate tasks
+Robust Production,Amazon RDS for PostgreSQL,db.t4g.medium (Multi-AZ),730 hours (100%),$0.096 / hour,70.08,High availability database (standby replica) with 50GB SSD
+Robust Production,Amazon S3,Standard Storage,500 GB / month,$0.023 / GB,11.5,Scaled up media storage for uploads
+Robust Production,Amazon CloudFront & Outbound Data,Data Transfer Out,500 GB / month,$0.00 / GB,0,First 1TB outbound is currently free under AWS Free Tier
+Robust Production,AWS NAT Gateway,1 Gateway + Data Processing,730 hours (100%),$0.045 / hour,32.85,Required for ECS/RDS in secure private subnets to reach the internet
+Robust Production,Amazon ElastiCache (Redis),cache.t4g.micro,730 hours (100%),$0.016 / hour,11.68,Used for rate limiting and rapid session storage (NextAuth)
+Robust Production,Amazon Route 53,DNS Hosting,1 Hosted Zone,$0.50 / zone,0.5,Domain management
+Robust Production,TOTAL ESTIMATE,,,,290.61,Enterprise-ready setup ensuring zero downtime

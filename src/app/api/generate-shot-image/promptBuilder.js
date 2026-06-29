@@ -470,7 +470,7 @@ export function buildPrompt({ shot, projectState, promptOverride, shotAssets = n
     'Photorealistic still frame matching the shot title and project context.'
   );
   const hasAnchor = matchedCharacters.some((character) => (
-    character?.anchor_image_url && /^https?:\/\//i.test(character.anchor_image_url)
+    character?.anchor_image_url && (/^https?:\/\//i.test(character.anchor_image_url) || String(character.anchor_image_url).startsWith('/uploads/'))
   ));
   const openingInstruction = hasAnchor
     ? `You are editing and adapting a character anchor frame for a specific music video shot.

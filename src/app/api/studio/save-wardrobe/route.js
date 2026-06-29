@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase-admin";
+import { prisma } from "@/utils/prisma";
+import { storage } from "@/utils/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -79,14 +80,12 @@ export async function POST(req) {
   if (!characterName) return NextResponse.json({ error: "Choose a character first." }, { status: 400 });
 
   try {
-    const supabase = createAdminClient();
-    const { data: project, error: fetchError } = await supabase
-      .from("projects")
-      .select("project_state")
-      .eq("id", projectId)
-      .single();
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { project_state: true }
+    });
 
-    if (fetchError || !project) {
+    if (!project) {
       return NextResponse.json({ error: "Project not found." }, { status: 404 });
     }
 
@@ -105,11 +104,9 @@ export async function POST(req) {
         : `${sanitize(safeCharacterName)}/outfits`;
       const path = `${projectId}/wardrobe/${folder}/${Date.now()}-${sanitize(file.name, "image")}`;
       const buffer = Buffer.from(await file.arrayBuffer());
-      const { error: uploadError } = await supabase.storage
-        .from("assets")
-        .upload(path, buffer, { contentType: file.type || "image/png", upsert: false });
+      const { error: uploadError } = await storage.from("assets").upload(path, buffer, { contentType: file.type || "image/png" });
       if (uploadError) continue;
-      const { data: { publicUrl } } = supabase.storage.from("assets").getPublicUrl(path);
+      const { data: { publicUrl } } = storage.from("assets").getPublicUrl(path);
       uploaded.push({
         url: publicUrl,
         path,
@@ -237,7 +234,7 @@ export async function POST(req) {
 
     if (removePath) {
       try {
-        await supabase.storage.from("assets").remove([removePath]);
+        await storage.from("assets").remove([removePath]);
       } catch (cleanupError) {
         console.warn("[studio/save-wardrobe] storage cleanup failed:", cleanupError?.message);
       }
@@ -249,12 +246,14 @@ export async function POST(req) {
       current_step: Math.max(Number(projectState.current_step) || 0, 6),
     };
 
-    const { error: updateError } = await supabase
-      .from("projects")
-      .update({ project_state: newState })
-      .eq("id", projectId);
-
-    if (updateError) throw updateError;
+    try {
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { project_state: newState }
+      });
+    } catch (updateError) {
+      throw updateError;
+    }
 
     return NextResponse.json({ success: true, projectId, wardrobe, outfit });
   } catch (error) {

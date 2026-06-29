@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase-admin";
+import { prisma } from "@/utils/prisma";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -55,21 +55,34 @@ function inferMime(url, contentType) {
   return "image/png";
 }
 
+import fs from 'fs/promises';
+import path from 'path';
+
 async function fetchImage(url) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS) });
-  if (!res.ok) throw new Error(`Image fetch ${res.status}`);
-  const buf = await res.arrayBuffer();
+  let buf;
+  let mime;
+  if (url.startsWith('/uploads/')) {
+    const localPath = path.join(process.cwd(), 'public', url);
+    buf = await fs.readFile(localPath);
+    mime = inferMime(url);
+  } else {
+    const res = await fetch(url, { signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS) });
+    if (!res.ok) throw new Error(`Image fetch ${res.status}`);
+    const arrayBuf = await res.arrayBuffer();
+    buf = Buffer.from(arrayBuf);
+    mime = inferMime(url, res.headers.get("content-type"));
+  }
   if (buf.byteLength > IMAGE_MAX_BYTES) throw new Error("Image too large");
   return {
-    mimeType: inferMime(url, res.headers.get("content-type")),
-    data: Buffer.from(buf).toString("base64"),
+    mimeType: mime,
+    data: buf.toString("base64"),
   };
 }
 
 function pickUrls(list, limit) {
   return (Array.isArray(list) ? list : [])
     .map((img) => (typeof img === "string" ? { url: img } : img))
-    .filter((img) => img?.url && /^https?:\/\//i.test(img.url))
+    .filter((img) => img?.url && (/^https?:\/\//i.test(img.url) || img.url.startsWith('/uploads/')))
     .slice(0, limit);
 }
 
@@ -212,10 +225,12 @@ export async function POST(req) {
   if (!projectId) return NextResponse.json({ error: "Missing projectId." }, { status: 400 });
   if (!characterName) return NextResponse.json({ error: "Link a named character template to this card first." }, { status: 400 });
 
-  const supabase = createAdminClient();
-  const { data: project, error: fetchError } = await supabase
-    .from("projects").select("project_state").eq("id", projectId).single();
-  if (fetchError || !project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { project_state: true }
+  });
+
+  if (!project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
 
   const projectState = project.project_state || {};
   const characters = Array.isArray(projectState.characters) ? [...projectState.characters] : [];
@@ -281,7 +296,7 @@ export async function POST(req) {
     ? { ...existingKB.characters } : {};
   kbCharacters[normalizeName(characterName)] = canonical;
 
-  const nextState = {
+  const newState = {
     ...projectState,
     studio_credits: balance - GENERATE_COST,
     characters,
@@ -293,9 +308,12 @@ export async function POST(req) {
     },
   };
 
-  const { error: updateError } = await supabase
-    .from("projects").update({ project_state: nextState }).eq("id", projectId);
-  if (updateError) {
+  try {
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { project_state: newState }
+    });
+  } catch (updateError) {
     console.error("[generate-character] persist failed:", updateError);
     return NextResponse.json({ error: "Failed to save the generated character." }, { status: 500 });
   }

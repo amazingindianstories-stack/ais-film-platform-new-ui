@@ -1,5 +1,7 @@
-import { createAdminClient } from "@/utils/supabase-admin";
-import { createClient as createServerSupabaseClient } from "@/utils/supabase-server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/utils/prisma";
+import { storage } from "@/utils/storage";
 
 const MAX_TITLE_LENGTH = 160;
 
@@ -7,26 +9,9 @@ export function errorResponse(message, status = 500) {
   return Response.json({ error: message }, { status });
 }
 
-function bearerToken(req) {
-  const header = req.headers.get("authorization") || "";
-  const match = header.match(/^Bearer\s+(.+)$/i);
-  return match?.[1] || "";
-}
-
 export async function getDashboardUser(req) {
-  const token = bearerToken(req);
-
-  if (token) {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase.auth.getUser(token);
-    if (!error && data?.user) return data.user;
-  }
-
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data?.user) return null;
-  return data.user;
+  const session = await getServerSession(authOptions);
+  return session?.user || null;
 }
 
 export function cleanProjectTitle(value) {
@@ -63,12 +48,12 @@ export async function requireDashboardUser(req) {
   return { user, response: null };
 }
 
-export async function listProjectAssetPaths(supabase, prefix) {
+export async function listProjectAssetPaths(prefix) {
   const out = [];
-  const { data, error } = await supabase.storage.from("assets").list(prefix);
+  const { data, error } = await storage.from("assets").list(prefix);
 
   if (error) {
-    console.warn(`[dashboard/projects] asset list failed for ${prefix}:`, error.message);
+    console.warn(`[dashboard/projects] asset list failed for ${prefix}:`, error?.message || error);
     return out;
   }
 
@@ -77,40 +62,35 @@ export async function listProjectAssetPaths(supabase, prefix) {
     if (item.id || item.metadata) {
       out.push(path);
     } else {
-      out.push(...await listProjectAssetPaths(supabase, path));
+      out.push(...await listProjectAssetPaths(path));
     }
   }
 
   return out;
 }
 
-export async function deleteProjectAndAssets({ projectId, userId, supabase }) {
-  const { data: project, error: fetchError } = await supabase
-    .from("projects")
-    .select("id,user_id")
-    .eq("id", projectId)
-    .eq("user_id", userId)
-    .single();
+export async function deleteProjectAndAssets({ projectId, userId }) {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId, user_id: userId }
+  });
 
-  if (fetchError || !project) {
+  if (!project) {
     return { error: "Project not found", status: 404 };
   }
 
-  const assetPaths = await listProjectAssetPaths(supabase, projectId);
+  const assetPaths = await listProjectAssetPaths(projectId);
   if (assetPaths.length) {
-    const { error: removeError } = await supabase.storage.from("assets").remove(assetPaths);
+    const { error: removeError } = await storage.from("assets").remove(assetPaths);
     if (removeError) {
       return { error: removeError.message || "Project assets could not be deleted", status: 500 };
     }
   }
 
-  const { error: deleteError } = await supabase
-    .from("projects")
-    .delete()
-    .eq("id", projectId)
-    .eq("user_id", userId);
-
-  if (deleteError) {
+  try {
+    await prisma.project.delete({
+      where: { id: projectId }
+    });
+  } catch (deleteError) {
     return { error: deleteError.message || "Project could not be deleted", status: 500 };
   }
 

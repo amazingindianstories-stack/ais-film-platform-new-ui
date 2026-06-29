@@ -1,4 +1,4 @@
-import { createClient as createServerSupabaseClient } from "@/utils/supabase-server";
+import { prisma } from "@/utils/prisma";
 import {
   deleteProjectAndAssets,
   errorResponse,
@@ -15,21 +15,17 @@ export async function GET(req, context) {
     return errorResponse("projectId is required", 400);
   }
 
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", projectId)
-    .eq("user_id", user.id)
-    .single();
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, user_id: user.id }
+  });
 
-  if (error || !data) {
+  if (!project) {
     return errorResponse("Project not found", 404);
   }
 
   return Response.json({
-    project: data,
-    summary: projectSummary(data),
+    project: project,
+    summary: projectSummary(project),
   });
 }
 
@@ -42,8 +38,7 @@ export async function DELETE(req, context) {
     return errorResponse("projectId is required", 400);
   }
 
-  const supabase = await createServerSupabaseClient();
-  const result = await deleteProjectAndAssets({ projectId, userId: user.id, supabase });
+  const result = await deleteProjectAndAssets({ projectId, userId: user.id });
   if (result.error) {
     return errorResponse(result.error, result.status);
   }

@@ -124,7 +124,7 @@ export function normalizeReferenceImage(image, index) {
 
   if (!imageData || typeof imageData !== "object") return null;
   const url = imageData.url || imageData.src || imageData.image_url || imageData.publicUrl;
-  if (!url || !/^https?:\/\//i.test(url)) return null;
+  if (!url || !(/^https?:\/\//i.test(url) || String(url).startsWith('/uploads/'))) return null;
 
   return {
     url,
@@ -157,7 +157,7 @@ export function getAssetReferenceImages(asset, kind, perAssetLimit) {
     .sort((a, b) => a.score - b.score)
     .slice(0, perAssetLimit);
 
-  if (!references.length && asset?.sheetUrl && /^https?:\/\//i.test(asset.sheetUrl)) {
+  if (!references.length && asset?.sheetUrl && (/^https?:\/\//i.test(asset.sheetUrl) || String(asset.sheetUrl).startsWith('/uploads/'))) {
     references.push({
       kind,
       name: asset?.name || (kind === "character" ? "Character" : "Location"),
@@ -236,7 +236,7 @@ export function collectWardrobeItems(wardrobe = [], shotCharacters = [], shotLoc
 export function getWardrobeReferenceImages(wardrobe, shotCharacters, shotLocations) {
   return collectWardrobeItems(wardrobe, shotCharacters, shotLocations)
     .map((item, index) => {
-      if (!item.image_url || !/^https?:\/\//i.test(item.image_url)) return null;
+      if (!item.image_url || !(/^https?:\/\//i.test(item.image_url) || String(item.image_url).startsWith('/uploads/'))) return null;
       return {
         kind: "wardrobe",
         name: item.location_name ? `${item.character_name} @ ${item.location_name}` : `${item.character_name} wardrobe`,
@@ -274,7 +274,7 @@ export function collectFocusedReferenceImages(matchedCharacters, matchedLocation
   const hasNamedMainCharacter = Boolean(primaryCharacter);
 
   if (primaryCharacter) {
-    if (primaryCharacter.anchor_image_url && /^https?:\/\//i.test(primaryCharacter.anchor_image_url)) {
+    if (primaryCharacter.anchor_image_url && (/^https?:\/\//i.test(primaryCharacter.anchor_image_url) || String(primaryCharacter.anchor_image_url).startsWith('/uploads/'))) {
       references.push({
         kind: "character",
         name: primaryCharacter.name,
@@ -319,9 +319,9 @@ export function collectFocusedReferenceImages(matchedCharacters, matchedLocation
     : [];
   const bestWardrobe = wardrobeItems.find((item) => (
     item.image_url &&
-    /^https?:\/\//i.test(item.image_url) &&
+    (/^https?:\/\//i.test(item.image_url) || String(item.image_url).startsWith('/uploads/')) &&
     normalizeLookupName(item.character_name) === normalizeLookupName(primaryCharacter?.name)
-  )) || wardrobeItems.find((item) => item.image_url && /^https?:\/\//i.test(item.image_url));
+  )) || wardrobeItems.find((item) => item.image_url && (/^https?:\/\//i.test(item.image_url) || String(item.image_url).startsWith('/uploads/')));
   if (bestWardrobe) {
     references.push({
       kind: "wardrobe",

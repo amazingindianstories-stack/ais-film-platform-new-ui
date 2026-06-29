@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase-admin";
+import { prisma } from "@/utils/prisma";
+import { storage } from "@/utils/storage";
 
 const MAX_AUDIO_BYTES = 200 * 1024 * 1024;
 
@@ -19,11 +20,20 @@ function sanitizeFileName(value) {
 
 function storagePathFromPublicUrl(url) {
   if (!url) return "";
+  if (url.startsWith("/")) {
+    const parts = String(url).split("/assets/");
+    return parts.length > 1 ? decodeURIComponent(parts[parts.length - 1]) : "";
+  }
   try {
     const parsed = new URL(url);
-    const marker = "/storage/v1/object/public/assets/";
+    const marker = "/uploads/assets/";
     const index = parsed.pathname.indexOf(marker);
-    if (index === -1) return "";
+    if (index === -1) {
+      const sbMarker = "/storage/v1/object/public/assets/";
+      const sbIndex = parsed.pathname.indexOf(sbMarker);
+      if (sbIndex !== -1) return decodeURIComponent(parsed.pathname.slice(sbIndex + sbMarker.length));
+      return "";
+    }
     return decodeURIComponent(parsed.pathname.slice(index + marker.length));
   } catch {
     const parts = String(url).split("/assets/");
@@ -58,14 +68,12 @@ export async function POST(req) {
       return NextResponse.json({ error: "Audio file must be under 200MB." }, { status: 413 });
     }
 
-    const supabase = createAdminClient();
-    const { data: project, error: projectError } = await supabase
-      .from("projects")
-      .select("audio_url")
-      .eq("id", projectId)
-      .single();
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { audio_url: true }
+    });
 
-    if (projectError || !project) {
+    if (!project) {
       return NextResponse.json({ error: "Project not found." }, { status: 404 });
     }
 
@@ -74,30 +82,24 @@ export async function POST(req) {
     const storagePath = `${projectId}/audio/${fileName}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { error: uploadError } = await supabase.storage
-      .from("assets")
-      .upload(storagePath, buffer, {
-        contentType: file.type || "audio/mpeg",
-        upsert: false,
-      });
-
+    const { error: uploadError } = await storage.from("assets").upload(storagePath, buffer, { contentType: file.type || "audio/mpeg" });
     if (uploadError) throw uploadError;
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("assets")
-      .getPublicUrl(storagePath);
+    const { data: { publicUrl } } = storage.from("assets").getPublicUrl(storagePath);
 
-    const { error: updateError } = await supabase
-      .from("projects")
-      .update({ audio_url: publicUrl })
-      .eq("id", projectId);
-
-    if (updateError) throw updateError;
+    try {
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { audio_url: publicUrl }
+      });
+    } catch (updateError) {
+      throw updateError;
+    }
 
     if (cleanupPrevious && project.audio_url) {
       const previousPath = storagePathFromPublicUrl(project.audio_url);
       if (previousPath && previousPath !== storagePath) {
-        await supabase.storage.from("assets").remove([previousPath]);
+        await storage.from("assets").remove([previousPath]);
       }
     }
 

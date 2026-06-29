@@ -54,7 +54,7 @@ function normalizeReferenceImage(image, index) {
 
   if (!imageData || typeof imageData !== "object") return null;
   const url = imageData.url || imageData.src || imageData.image_url || imageData.publicUrl;
-  if (!url || !/^https?:\/\//i.test(url)) return null;
+  if (!url || !(/^https?:\/\//i.test(url) || String(url).startsWith('/uploads/'))) return null;
 
   return {
     url,
@@ -92,7 +92,7 @@ function collectAnchorReferenceCandidates(character = {}) {
     })
     .filter(Boolean);
 
-  if (!panelRefs.length && character?.sheetUrl && /^https?:\/\//i.test(character.sheetUrl)) {
+  if (!panelRefs.length && character?.sheetUrl && (/^https?:\/\//i.test(character.sheetUrl) || String(character.sheetUrl).startsWith('/uploads/'))) {
     return [
       {
         url: character.sheetUrl,

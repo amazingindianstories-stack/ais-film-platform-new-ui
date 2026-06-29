@@ -84,15 +84,21 @@ function pickBestCharacterRefs(character, maxCount = 3) {
 }
 
 async function fetchImage(url) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS) });
-  if (!res.ok) throw new Error(`Fetch ${res.status}`);
-  const buf = await res.arrayBuffer();
+  let buf;
+  let mime;
+  if (url.startsWith('/uploads/')) {
+    const localPath = path.join(process.cwd(), 'public', url);
+    buf = await fs.readFile(localPath);
+    mime = inferMime(url);
+  } else {
+    const res = await fetch(url, { signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS) });
+    if (!res.ok) throw new Error(`Image fetch ${res.status}`);
+    const arrayBuf = await res.arrayBuffer();
+    buf = Buffer.from(arrayBuf);
+    mime = inferMime(url, res.headers.get("content-type"));
+  }
   if (buf.byteLength > IMAGE_MAX_BYTES) throw new Error("Image too large");
-  return {
-    url,
-    mimeType: inferMime(url, res.headers.get("content-type")),
-    data: Buffer.from(buf).toString("base64"),
-  };
+  return { url, mimeType: mime, data: buf.toString("base64") };
 }
 
 async function loadImages(refs) {

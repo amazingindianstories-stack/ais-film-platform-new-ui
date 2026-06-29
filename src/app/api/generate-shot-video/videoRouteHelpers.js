@@ -227,7 +227,7 @@ function parseMp4VideoDimensions(buffer) {
 }
 
 export async function fetchSourceImage(imageUrl) {
-  if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) return null;
+  if (!imageUrl || !(/^https?:\/\//i.test(imageUrl) || String(imageUrl).startsWith('/uploads/'))) return null;
 
   return withTimeout(async () => {
     const response = await fetch(imageUrl);
@@ -336,7 +336,7 @@ export async function downloadGeneratedVideo(generatedVideo, tmpPath) {
     return;
   }
 
-  if (video.uri && /^https?:\/\//i.test(video.uri)) {
+  if (video.uri && (/^https?:\/\//i.test(video.uri) || String(video.uri).startsWith('/uploads/'))) {
     const isGoogleApi = video.uri.includes("generativelanguage.googleapis.com") || video.uri.includes("googleapis.com");
     const authenticatedUrl = isGoogleApi && !video.uri.includes("key=")
       ? `${video.uri}${video.uri.includes("?") ? "&" : "?"}key=${process.env.GOOGLE_AI_API_KEY}`

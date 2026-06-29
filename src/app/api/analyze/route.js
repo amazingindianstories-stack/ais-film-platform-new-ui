@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createAdminClient } from "@/utils/supabase-admin";
+import { prisma } from "@/utils/prisma";
+import fs from "fs/promises";
+import path from "path";
 import {
   getFallbackModels,
   runWithModelFallback,
@@ -25,12 +27,19 @@ export async function POST(req) {
 
     console.log(`Starting analysis for project ${projectId} with audio ${audioUrl}`);
 
-    // 1. Fetch the audio file from Supabase URL
-    const audioResp = await fetch(audioUrl);
-    if (!audioResp.ok) throw new Error("Failed to fetch audio from URL");
-    
-    const audioBuffer = Buffer.from(await audioResp.arrayBuffer());
-    const mimeType = audioResp.headers.get("content-type") || "audio/mpeg";
+    // 1. Fetch the audio file from Supabase URL or read locally
+    let audioBuffer;
+    let mimeType = "audio/mpeg";
+
+    if (audioUrl.startsWith("/uploads/")) {
+      const localPath = path.join(process.cwd(), "public", audioUrl);
+      audioBuffer = await fs.readFile(localPath);
+    } else {
+      const audioResp = await fetch(audioUrl);
+      if (!audioResp.ok) throw new Error("Failed to fetch audio from URL");
+      audioBuffer = Buffer.from(await audioResp.arrayBuffer());
+      mimeType = audioResp.headers.get("content-type") || "audio/mpeg";
+    }
 
     const prompt = `
       Analyze this audio track (it's a song/music piece). 
@@ -107,17 +116,13 @@ export async function POST(req) {
         }, 0)
       : 0;
 
-    // 4. Update the project in Supabase
-    const supabase = createAdminClient();
-    
-    // Fetch current state to merge
-    const { data: project, error: fetchError } = await supabase
-      .from('projects')
-      .select('project_state')
-      .eq('id', projectId)
-      .single();
+    // 4. Update the project in Prisma
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { project_state: true }
+    });
 
-    if (fetchError) throw fetchError;
+    if (!project) throw new Error("Project not found");
 
     const newState = {
       ...project.project_state,
@@ -135,12 +140,14 @@ export async function POST(req) {
       current_step: 2 // Move to next step logically
     };
 
-    const { error: updateError } = await supabase
-      .from('projects')
-      .update({ project_state: newState })
-      .eq('id', projectId);
-
-    if (updateError) throw updateError;
+    try {
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { project_state: newState }
+      });
+    } catch (updateError) {
+      throw updateError;
+    }
 
     return NextResponse.json({ success: true, analysis: newState.analysis });
 

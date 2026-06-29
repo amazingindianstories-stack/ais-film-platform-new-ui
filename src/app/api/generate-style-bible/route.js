@@ -71,7 +71,7 @@ function normalizeReferenceImage(image, index) {
 
   if (!imageData || typeof imageData !== "object") return null;
   const url = imageData.url || imageData.src || imageData.image_url || imageData.publicUrl;
-  if (!url || !/^https?:\/\//i.test(url)) return null;
+  if (!url || !(/^https?:\/\//i.test(url) || String(url).startsWith('/uploads/'))) return null;
 
   return {
     url,
@@ -103,7 +103,7 @@ function getAssetReferenceImages(asset, { kind, perAssetLimit, priorities, fallb
     .sort((a, b) => a.score - b.score)
     .slice(0, perAssetLimit);
 
-  if (!references.length && asset?.sheetUrl && /^https?:\/\//i.test(asset.sheetUrl)) {
+  if (!references.length && asset?.sheetUrl && (/^https?:\/\//i.test(asset.sheetUrl) || String(asset.sheetUrl).startsWith('/uploads/'))) {
     references.push({
       kind,
       name: asset?.name || fallbackLabel,

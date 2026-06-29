@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/utils/supabase-admin";
+import { prisma } from "@/utils/prisma";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,14 +26,12 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing projectId." }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
-    const { data: project, error: fetchError } = await supabase
-      .from("projects")
-      .select("project_state")
-      .eq("id", cleanProjectId)
-      .single();
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { project_state: true }
+    });
 
-    if (fetchError || !project) {
+    if (!project) {
       return NextResponse.json({ error: "Project not found." }, { status: 404 });
     }
 

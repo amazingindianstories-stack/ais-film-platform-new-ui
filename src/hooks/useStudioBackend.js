@@ -543,6 +543,42 @@ export function useStudioBackend() {
     }
   }, [state.projectId, state.projectIsDemo, state.analysis, state.script]);
 
+  const analyzeScript = useCallback(async () => {
+    if (!state.projectId || state.projectIsDemo) {
+      const error = 'Open an authenticated project (?projectId=...) to analyse the script.';
+      setState((prev) => ({ ...prev, error }));
+      return { ok: false, error };
+    }
+    const rawText = state.script?.raw_text || state.script?.summary || '';
+    if (!rawText) {
+      const error = 'Upload or paste a script first.';
+      setState((prev) => ({ ...prev, error }));
+      return { ok: false, error };
+    }
+
+    setState((prev) => ({ ...prev, scriptStatus: 'analyzing', error: '' }));
+    try {
+      const data = await generateScriptFromLyrics({ projectId: state.projectId, idea: rawText, transcript: null });
+      setState((prev) => ({
+        ...prev,
+        script: data.script || prev.script,
+        characters: Array.isArray(data.characters) && data.characters.length ? data.characters : prev.characters,
+        locations: Array.isArray(data.locations) && data.locations.length ? data.locations : prev.locations,
+        projectState: mergeProjectState(prev, {
+          ...(data.script ? { script: data.script } : {}),
+          ...(Array.isArray(data.characters) && data.characters.length ? { characters: data.characters } : {}),
+          ...(Array.isArray(data.locations) && data.locations.length ? { locations: data.locations } : {}),
+        }),
+        scriptStatus: 'ready',
+        error: '',
+      }));
+      return { ok: true, script: data.script };
+    } catch (error) {
+      setState((prev) => ({ ...prev, scriptStatus: 'failed', error: error.message || 'Script analysis failed.' }));
+      return { ok: false, error };
+    }
+  }, [state.projectId, state.projectIsDemo, state.script]);
+
   const projectLabel = state.projectIsDemo
     ? `Demo ${state.projectId.replace(/^demo-/, '').slice(0, 8) || 'project'}`
     : state.projectId
@@ -557,6 +593,7 @@ export function useStudioBackend() {
     analyzeTrack,
     selectScriptFile,
     generateScript,
+    analyzeScript,
     hydrateProject,
     updateCharacters,
     updateLocations,

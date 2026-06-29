@@ -112,7 +112,29 @@ export async function POST(req) {
 
   if (isTextFile(file, mimeType)) {
     const text = await file.text();
-    return NextResponse.json(normalizeResult({ raw_text: text, summary: compact(text, 1400) }, text));
+    if (!ai) {
+      return NextResponse.json(normalizeResult({ raw_text: text, summary: compact(text, 1400) }, text));
+    }
+    const parts = [
+      { text: buildPrompt(file.name, storyPrompt, moodWords) },
+      { text: compact(text) },
+    ];
+    let responseText = "";
+    try {
+      const result = await ai.models.generateContent({
+        model: MODEL,
+        contents: [{ role: "user", parts }],
+      });
+      responseText = result.candidates?.[0]?.content?.parts?.find(part => part.text)?.text || "";
+    } catch (error) {
+      console.error("Script text extraction failed:", error);
+      return NextResponse.json(normalizeResult({ raw_text: text, summary: compact(text, 1400) }, text));
+    }
+    const raw = extractJsonObject(responseText);
+    if (!raw) {
+      return NextResponse.json(normalizeResult({ raw_text: text, summary: compact(text, 1400) }, text));
+    }
+    return NextResponse.json(normalizeResult(raw, text));
   }
 
   if (mimeType !== "application/pdf") {
